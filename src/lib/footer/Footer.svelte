@@ -1,5 +1,5 @@
 <script lang="ts">
-	const SocialIconItems: {
+	const SocialItems: {
 		title: string;
 		href: string;
 	}[] = [
@@ -29,6 +29,7 @@
 <footer class="footer">
 	<div class="footer__version">
 		Version:
+		<!-- svelte-ignore missing-declaration -->
 		<a
 			class="footer__version-link"
 			href={`https://github.com/crypto-pepe/p2p-marketplace/tree/${__GIT_COMMITHASH__}`}
@@ -36,7 +37,6 @@
 			target="_blank"
 			title="Github version"
 		>
-			<!-- svelte-ignoremissing-declaration -->
 			{__GIT_VERSION__}
 		</a>
 	</div>
@@ -53,7 +53,7 @@
 		</a>
 	</div>
 	<ul class="footer__socials">
-		{#each SocialIconItems as item}
+		{#each SocialItems as item}
 			<li class="footer__socials-item">
 				<a
 					class="footer__socials-item-link"
