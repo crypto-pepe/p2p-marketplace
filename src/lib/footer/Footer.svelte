@@ -41,7 +41,7 @@
 		</a>
 	</div>
 	<div class="footer__copyright">
-		Povered by
+		Powered by
 		<a
 			class="footer__copyright-link"
 			href="https://pepe.team"
