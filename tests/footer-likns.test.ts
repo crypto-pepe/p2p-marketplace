@@ -12,24 +12,6 @@ const requiredLinks = [
 	'https://github.com/crypto-pepe',
 ];
 
-async function getLinksArray(page) {
-	await page.goto('/');
-	const links = []
-	const footerLinks = await page.locator('footer a');
-	console.log()
-	const count = await footerLinks.count();
-	for (let i = 0; i < count; ++i) {
-		links.push(await footerLinks.nth(i).getAttribute('href'));
-	}
-
-	return links
-}
-
-
-
-
-
-
 test('XXXX', async ({ page }) => {
 	await page.goto('/');
 	const linkElements = await page.locator('footer a');
