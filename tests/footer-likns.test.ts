@@ -12,7 +12,7 @@ const requiredLinks = [
 	'https://github.com/crypto-pepe',
 ];
 
-test('The footer should contain the required links', async ({ page }) => {
+test('Footer should contain required links', async ({ page }) => {
 	await page.goto('/');
 	const linkElements = await page.locator('footer a');
 	const links = await linkElements.evaluateAll(list => list.map(link => link.getAttribute('href')));
