@@ -2,11 +2,11 @@
 </script>
 
 <svelte:head>
-	<title>pepe 2 pepe</title>
+	<title>Exchanges</title>
 	<!-- <meta name="description" content="Svelte demo app" /> -->
 </svelte:head>
 
-<section>Marketpalce</section>
+<section>Exchanges</section>
 
 <style>
 </style>
