@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-	import { page } from '$app/stores';
+	import NavBar from './navbar/NavBar.svelte';
 </script>
 
 <script lang="ts">
@@ -14,6 +14,7 @@
 		{
 			content: 'Account',
 			href: '/account'
+
 		},
 		{
 			content: 'Exchanges',
@@ -30,26 +31,12 @@
 	];
 
 	//get value from store
-	let isConnected: boolean = false;
+	let isConnected: boolean = true;
 </script>
 
 <header class="header">
 	<div class="header__logo">Logo</div>
-	<nav class="header__nav">
-		<ul class="header__nav-list">
-			{#each navLinks as link}
-				{#if isConnected}
-					<li class="header__nav-list" class:active={$page.url.pathname === link.href}>
-						<a href={link.href}>{link.content}</a>
-					</li>
-				{:else if link.href !== '/account' && link.href !== '/exchanges'}
-					<li class="header__nav-list" class:active={$page.url.pathname === link.href}>
-						<a href={link.href}>{link.content}</a>
-					</li>
-				{/if}
-			{/each}
-		</ul>
-	</nav>
+	<NavBar {isConnected} {navLinks} />
 	<div class="header__button">
 		<button>Connect</button>
 	</div>
