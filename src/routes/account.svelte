@@ -10,7 +10,7 @@
 
 <svelte:head>
 	<title>Account</title>
-	<meta name="description" content="About this app" />
+	<!-- <meta name="description" content="About this app" /> -->
 </svelte:head>
 
 <section>Account</section>
