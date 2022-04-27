@@ -31,7 +31,7 @@
 	];
 
 	//get value from store
-	let isConnected: boolean = true;
+	let isConnected: boolean = false;
 </script>
 
 <header class="header">

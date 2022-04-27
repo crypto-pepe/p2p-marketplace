@@ -8,14 +8,10 @@
 		href: string;
 	};
 
-	function isLocal(href: string): boolean {
-		const regexp = /^\//;
-		return regexp.test(href);
-	}
 </script>
 
 <li class="nav__list-item" class:active={$page.url.pathname === link.href}>
-	{#if isLocal(link.href)}
+	{#if (/^\//.test(link.href))}
 		<a class="nav__list-item-link" href={link.href}>
 			{link.content}
 		</a>
