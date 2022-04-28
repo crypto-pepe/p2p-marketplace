@@ -1,8 +1,9 @@
 <script lang="ts" context="module">
+	import type { Wallet } from '../../stores/wallet';
+	import { wallet } from '../../stores/wallet';
 	import NavBar from './navbar/NavBar.svelte';
-</script>
+	import ConnectWalletModal from '$lib/modal/connect-wallet-modal/ConnectWalletModal.svelte';
 
-<script lang="ts">
 	const navLinks: {
 		content: string;
 		href: string;
@@ -14,7 +15,6 @@
 		{
 			content: 'Account',
 			href: '/account'
-
 		},
 		{
 			content: 'Exchanges',
@@ -30,17 +30,32 @@
 		}
 	];
 
-	//get value from store
-	let isConnected: boolean = false;
+	function buttonDecorator(wallet: Wallet): {
+		title: string;
+		primary?: boolean;
+		secondary?: boolean;
+	} {
+		return wallet.isConnected
+			? { title: wallet.address, secondary: true }
+			: { title: 'Connect', primary: true };
+	}
+</script>
+
+<script lang="ts">
+	let connectWalletModal: ConnectWalletModal;
+
+	$: buttonArgs = buttonDecorator($wallet);
+	$: isConnected = $wallet.isConnected;
 </script>
 
 <header class="header">
 	<div class="header__logo">Logo</div>
 	<NavBar {isConnected} {navLinks} />
 	<div class="header__button">
-		<button>Connect</button>
+		<button on:click={connectWalletModal.show}>{buttonArgs.title}</button>
 	</div>
 </header>
+<ConnectWalletModal bind:this={connectWalletModal} />
 
 <style>
 </style>
