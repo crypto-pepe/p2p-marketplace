@@ -1,20 +1,36 @@
 import { expect, test } from '@playwright/test';
 
-const pages = ["pepe 2 pepe", "Account", "Exchanges", "Stats"]
-const requiredLinks = ["/", "/account", "/exchangex", "/stats", "https://pepe-team.tawk.help/"]
+const requiredLinks = ["/", "/account", "/exchanges", "/stats", "https://pepe-team.tawk.help/"]
 
-test('Test header component functionality', async ({ page }) => {
+test('Header should contain required links', async ({ page }) => {
+	await page.goto('/');
+	const linkElements = await page.locator('header nav a');
+	const links = linkElements.evaluateAll(list => list.map(link => link.getAttribute('href')));
+	expect(await links).toEqual(expect.arrayContaining(requiredLinks));
+});
+
+test('Nav should route to main page', async ({ page }) => {
   await page.goto('/');
-  const links = await page.locator('header nav a').evaluateAll(list => list.map(link => link.getAttribute('href')));
+  expect(await page.title()).toEqual('pepe 2 pepe');
+})
 
+test('Nav should route to account page', async ({ page }) => {
   await page.goto('/account');
+  expect(await page.title()).toEqual('Account');
+})
 
-  console.log(await page.url());
+test('Nav should route to exchanges page', async ({ page }) => {
+  await page.goto('/exchanges');
+  expect(await page.title()).toEqual('Exchanges');
+})
 
-  const titleElement = await page.locator('head title');
-  const title = await titleElement.textContent();
+test('Nav should route to stats page', async ({ page }) => {
+  await page.goto('/stats');
+  expect(await page.title()).toEqual('Stats');
+})
 
-  console.log(title);
-
-  // console.log(links);
+test('Nav should route to FAQ page', async ({ page }) => {
+  await page.goto('/');
+  await page.goto('https://pepe-team.tawk.help/');
+  expect(await page.title()).toEqual('PepeTeam Help Center');
 })
