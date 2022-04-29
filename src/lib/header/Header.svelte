@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
 	import type { Link } from 'src/types/types';
 	import NavBar from './navbar/NavBar.svelte';
-	
+
 	const navLinks: Link[] = [
 		{
 			content: 'Marketplace',
@@ -33,9 +33,9 @@
 	let isConnected: boolean = false;
 
 	const getVisibleLinks = (): Link[] => {
-		return navLinks.filter((link) => {
-			return isConnected ? link : link.href !== '/account' && link.href !== '/exchanges';
-		});
+		return navLinks.filter((link) =>
+			isConnected ? link : link.href !== '/account' && link.href !== '/exchanges'
+		);
 	};
 </script>
 
