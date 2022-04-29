@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>Account</title>
+	<title>P2P - Account</title>
 	<!-- <meta name="description" content="About this app" /> -->
 </svelte:head>
 

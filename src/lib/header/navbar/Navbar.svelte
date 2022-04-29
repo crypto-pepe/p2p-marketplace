@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-	import type { Link } from 'src/types/types';
+	import type { Link } from 'src/types';
 	import { page } from '$app/stores';
 </script>
 

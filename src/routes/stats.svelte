@@ -2,7 +2,7 @@
 </script>
 
 <svelte:head>
-	<title>Stats</title>
+	<title>P2P - Stats</title>
 	<!-- <meta name="description" content="Svelte demo app" /> -->
 </svelte:head>
 
