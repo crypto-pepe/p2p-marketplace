@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	import type { Wallet } from '../../stores/wallet';
-	import type { Link } from 'src/types/types';
+	import type { Link } from 'src/types';
 	import { wallet } from '../../stores/wallet';
 	import NavBar from './navbar/NavBar.svelte';
 	import ConnectWalletModal from '$lib/modal/connect-wallet-modal/ConnectWalletModal.svelte';
@@ -44,9 +44,9 @@
 	$: isConnected = $wallet.isConnected;
 
 	$: getVisibleLinks = (): Link[] => {
-		return navLinks.filter((link) => {
-			return isConnected ? link : link.href !== '/account' && link.href !== '/exchanges';
-		});
+		return navLinks.filter((link) =>
+			isConnected ? link : link.href !== '/account' && link.href !== '/exchanges'
+		);
 	};
 </script>
 

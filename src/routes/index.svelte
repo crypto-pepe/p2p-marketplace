@@ -2,7 +2,7 @@
 </script>
 
 <svelte:head>
-	<title>pepe 2 pepe</title>
+	<title>P2P - Marketplace</title>
 	<!-- <meta name="description" content="Svelte demo app" /> -->
 </svelte:head>
 

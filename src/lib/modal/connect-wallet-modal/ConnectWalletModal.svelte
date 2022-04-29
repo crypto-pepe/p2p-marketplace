@@ -39,12 +39,12 @@
 		if (await getWalletByType(walletType).isAvailable()) {
 			step = 'connecting';
 			connectionError = undefined;
-			try {
-				await connectWallet(walletType).then(modal.closeModal);
-			} catch (e) {
-				step = 'connect';
-				connectionError = e;
-			}
+			await connectWallet(walletType)
+				.then(modal.closeModal)
+				.catch((err) => {
+					step = 'connect';
+					connectionError = { code: err.code, message: err.message };
+				});
 		} else {
 			step = 'wavesKeeperInstall';
 		}
@@ -73,12 +73,12 @@
 		{#if step === 'connect'}
 			<button on:click={() => connect('waveskeeper')}>Connect wallet</button>
 		{:else if step === 'account'}
-			<button on:click={() => disconnect($wallet.type)}>Disconnect</button>
+			<button on:click={() => disconnect('waveskeeper')}>Disconnect</button>
 		{:else if step === 'connecting'}
 			some text about waiting loader
 		{:else if step === 'wavesKeeperInstall'}
 			<a
-				href={InstallByWallet[$wallet.type] && InstallByWallet[$wallet.type].href}
+				href={InstallByWallet['waveskeeper'] && InstallByWallet['waveskeeper'].href}
 				referrerpolicy="noopener noreferrer"
 				target="_blank"
 			>

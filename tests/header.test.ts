@@ -11,22 +11,22 @@ test('Header should contain required links', async ({ page }) => {
 
 test('Nav should route to main page', async ({ page }) => {
   await page.goto('/');
-  expect(await page.title()).toEqual('pepe 2 pepe');
+  expect(await page.title()).toEqual('P2P - Marketplace');
 })
 
 test('Nav should route to account page', async ({ page }) => {
   await page.goto('/account');
-  expect(await page.title()).toEqual('Account');
+  expect(await page.title()).toEqual('P2P - Account');
 })
 
 test('Nav should route to exchanges page', async ({ page }) => {
   await page.goto('/exchanges');
-  expect(await page.title()).toEqual('Exchanges');
+  expect(await page.title()).toEqual('P2P - Exchanges');
 })
 
 test('Nav should route to stats page', async ({ page }) => {
   await page.goto('/stats');
-  expect(await page.title()).toEqual('Stats');
+  expect(await page.title()).toEqual('P2P - Stats');
 })
 
 test('Nav should route to FAQ page', async ({ page }) => {

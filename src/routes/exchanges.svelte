@@ -2,7 +2,7 @@
 </script>
 
 <svelte:head>
-	<title>Exchanges</title>
+	<title>P2P - Exchanges</title>
 	<!-- <meta name="description" content="Svelte demo app" /> -->
 </svelte:head>
 
