@@ -1,8 +1,7 @@
-<script lang="ts">
-	const SocialItems: {
-		title: string;
-		href: string;
-	}[] = [
+<script lang="ts" constext="module">
+	import type { Link } from 'src/types/types';
+
+	const SocialItems: Link[] = [
 		{
 			title: 'Matrix',
 			href: '#'

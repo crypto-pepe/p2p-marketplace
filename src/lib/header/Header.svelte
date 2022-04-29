@@ -1,12 +1,10 @@
 <script lang="ts" context="module">
+	import type { Link } from 'src/types/types';
 	import NavBar from './navbar/NavBar.svelte';
 </script>
 
 <script lang="ts">
-	const navLinks: {
-		content: string;
-		href: string;
-	}[] = [
+	const navLinks: Link[] = [
 		{
 			content: 'Marketplace',
 			href: '/'
@@ -14,7 +12,6 @@
 		{
 			content: 'Account',
 			href: '/account'
-
 		},
 		{
 			content: 'Exchanges',

@@ -3,10 +3,10 @@ import { expect, test } from '@playwright/test';
 const requiredLinks = ["/", "/account", "/exchanges", "/stats", "https://pepe-team.tawk.help/"]
 
 test('Header should contain required links', async ({ page }) => {
-	await page.goto('/');
-	const linkElements = await page.locator('header nav a');
-	const links = linkElements.evaluateAll(list => list.map(link => link.getAttribute('href')));
-	expect(await links).toEqual(expect.arrayContaining(requiredLinks));
+  await page.goto('/');
+  const linkElements = await page.locator('header nav a');
+  const links = await linkElements.evaluateAll(list => list.map(link => link.getAttribute('href')));
+  expect(links).toEqual(expect.arrayContaining(requiredLinks));
 });
 
 test('Nav should route to main page', async ({ page }) => {
