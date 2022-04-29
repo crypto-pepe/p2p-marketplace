@@ -11,7 +11,8 @@
 	export function closeModal() {
 		visible = false;
 	}
-	function handleKeyEsc(event: any) {
+	
+	function handleKeyEsc(event: KeyboardEvent) {
 		if (event.key === 'Escape' && isCloseByEsc) {
 			visible = false;
 		}
