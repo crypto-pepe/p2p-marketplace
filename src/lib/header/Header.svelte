@@ -1,9 +1,7 @@
 <script lang="ts" context="module">
 	import type { Link } from 'src/types/types';
 	import NavBar from './navbar/NavBar.svelte';
-</script>
-
-<script lang="ts">
+	
 	const navLinks: Link[] = [
 		{
 			content: 'Marketplace',
@@ -28,9 +26,11 @@
 			referrerpolicy: 'noopener noreferrer'
 		}
 	];
+</script>
 
+<script lang="ts">
 	//get value from store
-	let isConnected: boolean = true;
+	let isConnected: boolean = false;
 
 	const getVisibleLinks = (): Link[] => {
 		return navLinks.filter((link) => {
