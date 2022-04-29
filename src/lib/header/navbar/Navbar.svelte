@@ -1,24 +1,25 @@
 <script lang="ts" context="module">
-  import NavLinkItem from './NavLinkItem.svelte';
+	import type { Link } from 'src/types/types';
+	import { page } from '$app/stores';
 </script>
 
 <script lang="ts">
-
-	export let isConnected: boolean = false;
-	export let navLinks: {
-		content: string;
-		href: string;
-	}[] = [];
+	export let navLinks: Link[] = [];
 </script>
 
 <nav class="nav">
 	<ul class="nav__list">
 		{#each navLinks as link}
-			{#if isConnected}
-				<NavLinkItem {link} />
-			{:else if link.href !== '/account' && link.href !== '/exchanges'}
-				<NavLinkItem {link} />
-			{/if}
+			<li class="nav__list-item" class:active={$page.url.pathname === link.href}>
+				<a
+					class="nav__list-item-link"
+					href={link.href}
+					target={link.target}
+					referrerpolicy={link.referrerpolicy}
+				>
+					{link.content}
+				</a>
+			</li>
 		{/each}
 	</ul>
 </nav>

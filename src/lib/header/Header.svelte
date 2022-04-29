@@ -23,17 +23,25 @@
 		},
 		{
 			content: 'FAQ',
-			href: 'https://pepe-team.tawk.help/'
+			href: 'https://pepe-team.tawk.help/',
+			target: '_blank',
+			referrerpolicy: 'noopener noreferrer'
 		}
 	];
 
 	//get value from store
-	let isConnected: boolean = false;
+	let isConnected: boolean = true;
+
+	const getVisibleLinks = (): Link[] => {
+		return navLinks.filter((link) => {
+			return isConnected ? link : link.href !== '/account' && link.href !== '/exchanges';
+		});
+	};
 </script>
 
 <header class="header">
 	<div class="header__logo">Logo</div>
-	<NavBar {isConnected} {navLinks} />
+	<NavBar navLinks={getVisibleLinks()} />
 	<div class="header__button">
 		<button>Connect</button>
 	</div>
