@@ -3,7 +3,7 @@
 	import type { Link } from 'src/types';
 	import { wallet } from '../../stores/wallet';
 	import NavBar from './navbar/NavBar.svelte';
-	import ConnectWalletModal from '$lib/modal/connect-wallet-modal/ConnectWalletModal.svelte';
+	import ConnectWalletModal from '../modal/connect-wallet-modal/ConnectWalletModal.svelte';
 
 	const navLinks: Link[] = [
 		{

@@ -1,6 +1,8 @@
 <script lang="ts" context="module">
 	import type { WalletType, ConnectionError } from '../../../stores/wallet';
 	import { wallet, connectWallet, disconnectWallet } from '../../../stores/wallet';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { getWalletByType } from '../../../wallet/helper';
 	import Modal from '../Modal.svelte';
 
@@ -53,6 +55,9 @@
 	async function disconnect(walletType: WalletType) {
 		step = 'connect';
 		await disconnectWallet(walletType).finally(modal.closeModal);
+		if ($page.url.pathname === '/account' || $page.url.pathname === '/exchanges') {
+			goto('/');
+		}
 	}
 </script>
 
