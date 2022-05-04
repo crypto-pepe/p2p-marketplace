@@ -1,5 +1,8 @@
 <script lang="ts" context="module">
 	import { browser, dev } from '$app/env';
+	import { goto } from '$app/navigation';
+	import { wallet } from '../stores/wallet';
+	import { onMount } from 'svelte';
 
 	// we don't need any JS on this page, though we'll load
 	// it in dev so that we get hot module replacement...
@@ -9,6 +12,11 @@
 </script>
 
 <script lang="ts">
+	onMount(() => {
+		if (!$wallet.isConnected) {
+			goto('/');
+		}
+	});
 </script>
 
 <svelte:head>

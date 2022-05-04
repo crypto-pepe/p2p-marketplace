@@ -1,4 +1,15 @@
 <script context="module" lang="ts">
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { wallet } from '../stores/wallet';
+</script>
+
+<script lang="ts">
+	onMount(() => {
+		if (!$wallet.isConnected) {
+			goto('/');
+		}
+	});
 </script>
 
 <svelte:head>
