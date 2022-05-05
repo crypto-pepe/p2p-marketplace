@@ -1,11 +1,40 @@
 import type IWalletProvider from "./";
-import {
-  getAddress,
-  getChainId,
-  getBalance,
-  isAvailable,
-} from "../utils/waveskeeper";
 import type { AssetInfo } from "./";
+
+const wavesKeeperRequestWrapper = (): Promise<any> => {
+  if (!isAvailable()) {
+    return Promise.reject();
+  }
+
+  return window.WavesKeeper.initialPromise;
+};
+
+const isAvailable = (): boolean => window.WavesKeeper !== undefined;
+
+const getAddress = (): Promise<string> =>
+  wavesKeeperRequestWrapper()
+    .then((keeper) => keeper.publicState())
+    .then((state) => state.account.address);
+
+const getChainId = (): Promise<string> =>
+  wavesKeeperRequestWrapper()
+    .then((keeper) => keeper.publicState())
+    .then((state) => state.network.code);
+
+const getBalance = (asset?: string): Promise<BigInt> =>
+  wavesKeeperRequestWrapper()
+    .then((keeper) => keeper.publicState())
+    .then((state) => {
+      if (asset) {
+        if (state.account.balance.assets[asset]) {
+          return Promise.resolve(state.account.balance.assets[asset].balance);
+        } else {
+          return Promise.resolve(BigInt(0));
+        }
+      } else {
+        return BigInt(state.account.balance.available);
+      }
+    });
 
 let changedCallback: Function | undefined;
 
