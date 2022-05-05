@@ -36,6 +36,17 @@ describe('binance price oracle', () => {
 		expect(data.date.getTime()).toBeLessThanOrEqual(new Date().getTime());
 	});
 
+	it('should successufull fetch inverted price', async () => {
+		const startTime = new Date().getTime();
+		fetchMock.mockResponseOnce(JSON.stringify({ lastPrice: '2' }));
+		const data = await oracle.fetchPrice('RUB');
+
+		expect(data.asset).toEqual('RUB');
+		expect(data.price).toEqual(0.5);
+		expect(data.date.getTime()).toBeGreaterThanOrEqual(startTime);
+		expect(data.date.getTime()).toBeLessThanOrEqual(new Date().getTime());
+	});
+
 	it('should fail fetch unavailable price', async () => {
 		fetchMock.mockResponseOnce(
 			JSON.stringify({
