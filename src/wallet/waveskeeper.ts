@@ -73,7 +73,7 @@ export class WavesKeeperWalletProvider implements IWalletProvider {
     return getBalance(asset);
   }
 
-  getAssetInfo(asset?: string): Promise<AssetInfo> {
+  getAssetInfo(asset?: string): Promise<AssetInfo | undefined> {
     if (asset) {
       return Promise.resolve(undefined);
     } else {

@@ -33,7 +33,7 @@
 	function buttonDecorator(wallet: Wallet): {
 		title: string;
 	} {
-		return wallet.isConnected ? { title: wallet.address } : { title: 'Connect' };
+		return wallet.isConnected ? { title: wallet.address || "Account" } : { title: 'Connect' };
 	}
 </script>
 
