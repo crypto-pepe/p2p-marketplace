@@ -1,4 +1,4 @@
-const wavesKeeperRequestWrapper = async (): Promise<any> => {
+const wavesKeeperRequestWrapper = (): Promise<any> => {
   if (!isAvailable()) {
     return Promise.reject();
   }
@@ -8,17 +8,17 @@ const wavesKeeperRequestWrapper = async (): Promise<any> => {
 
 export const isAvailable = (): boolean => window.WavesKeeper !== undefined;
 
-export const getAddress = async (): Promise<string> =>
+export const getAddress = (): Promise<string> =>
   wavesKeeperRequestWrapper()
     .then((keeper) => keeper.publicState())
     .then((state) => state.account.address);
 
-export const getChainId = async (): Promise<string> =>
+export const getChainId = (): Promise<string> =>
   wavesKeeperRequestWrapper()
     .then((keeper) => keeper.publicState())
     .then((state) => state.network.code);
 
-export const getBalance = async (asset?: string): Promise<BigInt> =>
+export const getBalance = (asset?: string): Promise<BigInt> =>
   wavesKeeperRequestWrapper()
     .then((keeper) => keeper.publicState())
     .then((state) => {
