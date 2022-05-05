@@ -6,14 +6,12 @@
 	import { getWalletByType } from '../../../wallet/helper';
 	import Modal from '../Modal.svelte';
 
-	type Step = 'account' | 'connect' | 'connecting' | 'wavesKeeperInstall';
-
-	const TitleByStepMap: { [step in Step]: string } = {
-		account: 'Account',
-		connect: 'Connect Wallet',
-		connecting: 'Connecting...',
-		wavesKeeperInstall: 'Install WavesKeeper'
-	};
+	enum Step {
+		account = 'Account',
+		connect = 'Connect',
+		connecting = 'Connecting...',
+		wavesKeeperInstall = 'Install WavesKeeper'
+	}
 
 	const InstallByWallet: { [walletType in WalletType]: { href: string } } = {
 		waveskeeper: {
@@ -24,36 +22,36 @@
 
 <script lang="ts">
 	let modal: Modal;
-	let step: Step = $wallet.isConnected ? 'account' : 'connect';
+	let step: Step = $wallet.isConnected ? Step.account : Step.connect;
 	let connectionError: ConnectionError | undefined;
 
 	export function show() {
 		connectionError = undefined;
 		if ($wallet.isConnected) {
-			step = 'account';
+			step = Step.account;
 		} else {
-			step = 'connect';
+			step = Step.connect;
 		}
 		modal && modal.openModal();
 	}
 
 	async function connect(walletType: WalletType) {
 		if (await getWalletByType(walletType).isAvailable()) {
-			step = 'connecting';
+			step = Step.connecting;
 			connectionError = undefined;
 			await connectWallet(walletType)
 				.then(modal.closeModal)
 				.catch((err) => {
-					step = 'connect';
+					step = Step.connect;
 					connectionError = { code: err.code, message: err.message };
 				});
 		} else {
-			step = 'wavesKeeperInstall';
+			step = Step.wavesKeeperInstall;
 		}
 	}
 
 	async function disconnect(walletType: WalletType) {
-		step = 'connect';
+		step = Step.connect;
 		await disconnectWallet(walletType).finally(modal.closeModal);
 		if ($page.url.pathname === '/account' || $page.url.pathname === '/exchanges') {
 			goto('/');
@@ -63,7 +61,7 @@
 
 <Modal bind:this={modal}>
 	<div class="title" slot="title">
-		{#if step === 'account'}
+		{#if step === Step.account}
 			<div>
 				{$wallet.address}
 			</div>
@@ -71,17 +69,17 @@
 				{$wallet.type}
 			</div>
 		{:else}
-			<h6>{TitleByStepMap[step]}</h6>
+			<h6>{step}</h6>
 		{/if}
 	</div>
 	<div class="content" slot="content">
-		{#if step === 'connect'}
+		{#if step === Step.connect}
 			<button on:click={() => connect('waveskeeper')}>Connect wallet</button>
-		{:else if step === 'account'}
+		{:else if step === Step.account}
 			<button on:click={() => disconnect('waveskeeper')}>Disconnect</button>
-		{:else if step === 'connecting'}
+		{:else if step === Step.connecting}
 			some text about waiting loader
-		{:else if step === 'wavesKeeperInstall'}
+		{:else if step === Step.wavesKeeperInstall}
 			<a
 				href={InstallByWallet['waveskeeper'] && InstallByWallet['waveskeeper'].href}
 				referrerpolicy="noopener noreferrer"
