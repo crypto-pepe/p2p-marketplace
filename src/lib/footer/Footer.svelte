@@ -1,25 +1,29 @@
-<script lang="ts">
-	const SocialItems: {
-		title: string;
-		href: string;
-	}[] = [
+<script lang="ts" constext="module">
+	import type { Link } from 'src/types';
+
+	const SocialItems: Link[] = [
 		{
+			content: 'Matrix',
 			title: 'Matrix',
 			href: '#'
 		},
 		{
+			content: 'Medium',
 			title: 'Medium',
 			href: 'https://crypto-pepe-team.medium.com'
 		},
 		{
+			content: 'Twitter',
 			title: 'Twitter',
 			href: 'https://twitter.com/cryptopepeteam'
 		},
 		{
+			content: 'Telegram',
 			title: 'Telegram',
 			href: 'https://t.me/pepe_team'
 		},
 		{
+			content: 'GitHub',
 			title: 'GitHub',
 			href: 'https://github.com/crypto-pepe'
 		}
@@ -62,7 +66,7 @@
 					referrerpolicy="noopener noreferrer"
 					target="_blank"
 				>
-					{item.title}
+					{item.content}
 				</a>
 			</li>
 		{/each}
