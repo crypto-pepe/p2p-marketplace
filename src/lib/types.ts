@@ -4,6 +4,6 @@ export type Asset = CryptoAsset | FiatAsset;
 
 export type Price = {
 	price: number;
-	timestamp: Date;
+	date: Date;
 };
 export type PricesMap = Partial<Record<Asset, Price>>;

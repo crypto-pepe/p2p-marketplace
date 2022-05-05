@@ -14,7 +14,9 @@ export const prices = readable<PricesMap>(state, (set) => {
 		).reduce<PricesMap>(
 			(acc: PricesMap, p: PromiseSettledResult<Price>) => ({
 				...acc,
-				...(p.status === 'fulfilled' ? { [p.value.asset]: p.value } : {})
+				...(p.status === 'fulfilled'
+					? { [p.value.asset]: { price: p.value.price, date: p.value.date } }
+					: {})
 			}),
 			state
 		);
