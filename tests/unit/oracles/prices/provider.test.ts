@@ -1,7 +1,7 @@
-import type { Price } from '../../../../src/lib/oracles/prices';
-import { fetchPrice } from '../../../../src/lib/oracles/prices';
+import { type Price, fetchPrice } from 'src/lib/oracles/prices';
+import { CryptoAsset } from 'src/lib/types';
 
-const stubPrice: Price = { asset: 'BTC', date: new Date(1000000), price: 1223.54 };
+const stubPrice: Price = { asset: CryptoAsset.BTC, timestamp: new Date(1000000), price: 1223.54 };
 
 describe('price oracle', () => {
 	test('should check available asset for all oracles', async () => {
@@ -14,7 +14,9 @@ describe('price oracle', () => {
 			fetchPrice: jest.fn(async (): Promise<Price> => stubPrice)
 		};
 
-		await expect(fetchPrice('BTC', [firstOracle, secondOracle])).rejects.toThrow('empty price');
+		await expect(fetchPrice(CryptoAsset.BTC, [firstOracle, secondOracle])).rejects.toThrow(
+			'empty price'
+		);
 		expect(firstOracle.isAvailable).toHaveBeenCalled();
 		expect(firstOracle.fetchPrice).not.toHaveBeenCalled();
 		expect(secondOracle.isAvailable).toHaveBeenCalled();
@@ -31,7 +33,7 @@ describe('price oracle', () => {
 			fetchPrice: jest.fn(async (): Promise<Price> => stubPrice)
 		};
 
-		expect(await fetchPrice('BTC', [firstOracle, secondOracle])).toEqual(stubPrice);
+		expect(await fetchPrice(CryptoAsset.BTC, [firstOracle, secondOracle])).toEqual(stubPrice);
 		expect(firstOracle.isAvailable).toHaveBeenCalled();
 		expect(firstOracle.fetchPrice).toHaveBeenCalled();
 		expect(secondOracle.isAvailable).not.toHaveBeenCalled();
@@ -50,7 +52,7 @@ describe('price oracle', () => {
 			fetchPrice: jest.fn(async (): Promise<Price> => stubPrice)
 		};
 
-		expect(await fetchPrice('BTC', [firstOracle, secondOracle])).toEqual(stubPrice);
+		expect(await fetchPrice(CryptoAsset.BTC, [firstOracle, secondOracle])).toEqual(stubPrice);
 		expect(firstOracle.isAvailable).toHaveBeenCalled();
 		expect(firstOracle.fetchPrice).toHaveBeenCalled();
 		expect(secondOracle.isAvailable).toHaveBeenCalled();
@@ -67,7 +69,7 @@ describe('price oracle', () => {
 			fetchPrice: jest.fn(async (): Promise<Price> => stubPrice)
 		};
 
-		expect(await fetchPrice('BTC', [firstOracle, secondOracle])).toEqual(stubPrice);
+		expect(await fetchPrice(CryptoAsset.BTC, [firstOracle, secondOracle])).toEqual(stubPrice);
 		expect(firstOracle.isAvailable).toHaveBeenCalled();
 		expect(firstOracle.fetchPrice).not.toHaveBeenCalled();
 		expect(secondOracle.isAvailable).toHaveBeenCalled();

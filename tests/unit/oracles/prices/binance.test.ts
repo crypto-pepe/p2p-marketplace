@@ -1,14 +1,14 @@
 import fetchMock from 'jest-fetch-mock';
-import { BinancePriceOracle } from '../../../../src/lib/oracles/prices/binance';
-import type { Asset } from '../../../../src/lib/types';
+import { BinancePriceOracle } from 'src/lib/oracles/prices/binance';
+import { type Asset, CryptoAsset, FiatAsset } from 'src/lib/types';
 
 const expectedPrices: [Asset, boolean][] = [
-	['BTC', true],
-	['ETH', true],
-	['WAVES', true],
-	['EUR', true],
-	['GBP', true],
-	['RUB', true]
+	[CryptoAsset.BTC, true],
+	[CryptoAsset.ETH, true],
+	[CryptoAsset.WAVES, true],
+	[FiatAsset.EUR, true],
+	[FiatAsset.GPB, false],
+	[FiatAsset.RUB, true]
 ];
 
 beforeEach(() => {
@@ -25,29 +25,29 @@ describe('binance price oracle', () => {
 		});
 	});
 
-	it('should successufull fetch price', async () => {
+	it('should successfully fetch price', async () => {
 		const startTime = new Date().getTime();
 		fetchMock.mockResponseOnce(JSON.stringify({ lastPrice: '38918.11000000' }));
-		const data = await oracle.fetchPrice('BTC');
+		const data = await oracle.fetchPrice(CryptoAsset.BTC);
 
-		expect(data.asset).toEqual('BTC');
+		expect(data.asset).toEqual(CryptoAsset.BTC);
 		expect(data.price).toEqual(38918.11);
-		expect(data.date.getTime()).toBeGreaterThanOrEqual(startTime);
-		expect(data.date.getTime()).toBeLessThanOrEqual(new Date().getTime());
+		expect(data.timestamp.getTime()).toBeGreaterThanOrEqual(startTime);
+		expect(data.timestamp.getTime()).toBeLessThanOrEqual(new Date().getTime());
 	});
 
 	it('should successufull fetch inverted price', async () => {
 		const startTime = new Date().getTime();
 		fetchMock.mockResponseOnce(JSON.stringify({ lastPrice: '2' }));
-		const data = await oracle.fetchPrice('RUB');
+		const data = await oracle.fetchPrice(FiatAsset.RUB);
 
-		expect(data.asset).toEqual('RUB');
+		expect(data.asset).toEqual(FiatAsset.RUB);
 		expect(data.price).toEqual(0.5);
-		expect(data.date.getTime()).toBeGreaterThanOrEqual(startTime);
-		expect(data.date.getTime()).toBeLessThanOrEqual(new Date().getTime());
+		expect(data.timestamp.getTime()).toBeGreaterThanOrEqual(startTime);
+		expect(data.timestamp.getTime()).toBeLessThanOrEqual(new Date().getTime());
 	});
 
-	it('should fail fetch unavailable price', async () => {
+	it('should fail while fetching unavailable price', async () => {
 		fetchMock.mockResponseOnce(
 			JSON.stringify({
 				code: -1121,
@@ -55,14 +55,14 @@ describe('binance price oracle', () => {
 			}),
 			{ status: 400 }
 		);
-		await expect(oracle.fetchPrice('BTC')).rejects.toThrow(
-			"binance provider: can't fetch price for BTC"
+		await expect(oracle.fetchPrice(CryptoAsset.BTC)).rejects.toThrow(
+			"binance provider: can't fetch price for BTC with status 400"
 		);
 	});
 
 	it('should fail fetch incorrect price', async () => {
 		fetchMock.mockResponseOnce(JSON.stringify({ lastPrice: 'BADVALUE' }));
-		await expect(oracle.fetchPrice('BTC')).rejects.toThrow(
+		await expect(oracle.fetchPrice(CryptoAsset.BTC)).rejects.toThrow(
 			"binance provider: can't decode price BADVALUE"
 		);
 	});

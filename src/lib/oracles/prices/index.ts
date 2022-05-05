@@ -1,10 +1,10 @@
-import type { Asset } from '../../types';
+import type { Asset } from '$lib/types';
 
 export type PriceOracleType = 'binance';
 export type Price = {
 	asset: Asset;
 	price: number;
-	date: Date;
+	timestamp: Date;
 };
 
 export interface IPriceOracle {

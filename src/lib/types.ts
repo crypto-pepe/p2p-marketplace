@@ -1,9 +1,19 @@
-export type CryptoAsset = 'BTC' | 'ETH' | 'USDT' | 'WAVES';
-export type FiatAsset = 'USD' | 'EUR' | 'GBP' | 'RUB';
+export enum CryptoAsset {
+	BTC = 'BTC',
+	ETH = 'ETH',
+	USDT = 'USDT',
+	WAVES = 'WAVES'
+}
+export enum FiatAsset {
+	USD = 'USD',
+	EUR = 'EUR',
+	GPB = 'GPB',
+	RUB = 'RUB'
+}
 export type Asset = CryptoAsset | FiatAsset;
 
 export type Price = {
 	price: number;
-	date: Date;
+	timestamp: Date;
 };
 export type PricesMap = Partial<Record<Asset, Price>>;

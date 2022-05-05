@@ -1,26 +1,29 @@
-import type { Asset } from '../../types';
+import { CryptoAsset, FiatAsset, type Asset } from '$lib/types';
 import type { Price, IPriceOracle } from './';
-
-const endpoint: string = 'https://api.binance.com';
-const usdAsset: Asset = 'USDT';
-
-// BTCUSDT but USDTRUB
-const assetsInverted: Partial<Record<Asset, boolean>> = {
-	BTC: false,
-	ETH: false,
-	WAVES: false,
-	EUR: false,
-	GBP: false,
-	RUB: true
-};
 
 type BinanceResponse = {
 	lastPrice: string;
 };
 
+type AssetMeta = {
+	isInverted: boolean;
+};
+
+const endpoint: string = 'https://api.binance.com';
+const usdAsset: Asset = CryptoAsset.USDT;
+
+// BTCUSDT but USDTRUB
+const assetsMeta: Partial<Record<Asset, AssetMeta>> = {
+	[CryptoAsset.BTC]: { isInverted: false },
+	[CryptoAsset.ETH]: { isInverted: false },
+	[CryptoAsset.WAVES]: { isInverted: false },
+	[FiatAsset.EUR]: { isInverted: false },
+	[FiatAsset.RUB]: { isInverted: true }
+};
+
 export class BinancePriceOracle implements IPriceOracle {
 	isAvailable(asset: Asset): boolean {
-		return assetsInverted[asset] !== undefined;
+		return assetsMeta[asset] !== undefined;
 	}
 
 	async fetchPrice(asset: Asset): Promise<Price> {
@@ -28,13 +31,15 @@ export class BinancePriceOracle implements IPriceOracle {
 			throw new Error(`binance provider: asset isn't available ${asset}`);
 		}
 
-		const fetchRequest =
+		const url =
 			`${endpoint}/api/v3/ticker/24hr?symbol=` +
-			(assetsInverted[asset] ? `${usdAsset}${asset}` : `${asset}${usdAsset}`);
+			(assetsMeta[asset]?.isInverted ? `${usdAsset}${asset}` : `${asset}${usdAsset}`);
 
-		const response = await fetch(fetchRequest);
+		const response = await fetch(url);
 		if (response.status != 200) {
-			throw new Error(`binance provider: can't fetch price for ${asset}`);
+			throw new Error(
+				`binance provider: can't fetch price for ${asset} with status ${response.status}`
+			);
 		}
 
 		const data: BinanceResponse = await response.json();
@@ -43,6 +48,10 @@ export class BinancePriceOracle implements IPriceOracle {
 			throw new Error(`binance provider: can't decode price ${data.lastPrice}`);
 		}
 
-		return { asset, price: assetsInverted[asset] ? 1.0 / price : price, date: new Date() };
+		return {
+			asset,
+			price: assetsMeta[asset]?.isInverted ? 1.0 / price : price,
+			timestamp: new Date()
+		};
 	}
 }

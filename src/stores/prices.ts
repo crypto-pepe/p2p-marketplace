@@ -1,8 +1,8 @@
 import { readable } from 'svelte/store';
 import type { PricesMap } from '$lib/types';
-import { PRICE_ORACLE_ASSETS, PRICE_ORACLE_INTERVAL } from '../lib/constants';
-import { fetchPrice, type IPriceOracle, type Price } from '../lib/oracles/prices';
-import { BinancePriceOracle } from '../lib/oracles/prices/binance';
+import { PRICE_ORACLE_ASSETS, PRICE_ORACLE_INTERVAL_IN_MILLIS } from '$lib/constants';
+import { fetchPrice, type IPriceOracle, type Price } from '$lib/oracles/prices';
+import { BinancePriceOracle } from '$lib/oracles/prices/binance';
 
 const oracles: IPriceOracle[] = [new BinancePriceOracle()];
 let state: PricesMap = {};
@@ -15,7 +15,7 @@ export const prices = readable<PricesMap>(state, (set) => {
 			(acc: PricesMap, p: PromiseSettledResult<Price>) => ({
 				...acc,
 				...(p.status === 'fulfilled'
-					? { [p.value.asset]: { price: p.value.price, date: p.value.date } }
+					? { [p.value.asset]: { price: p.value.price, timestamp: p.value.timestamp } }
 					: {})
 			}),
 			state
@@ -25,6 +25,6 @@ export const prices = readable<PricesMap>(state, (set) => {
 	};
 
 	updatePrices();
-	const intervalId = setInterval(updatePrices, PRICE_ORACLE_INTERVAL);
+	const intervalId = setInterval(updatePrices, PRICE_ORACLE_INTERVAL_IN_MILLIS);
 	return () => clearInterval(intervalId);
 });
