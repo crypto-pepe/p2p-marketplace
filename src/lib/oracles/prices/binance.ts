@@ -43,6 +43,6 @@ export class BinancePriceOracle implements IPriceOracle {
 			throw new Error(`binance provider: can't decode price ${data.lastPrice}`);
 		}
 
-		return { asset, price, date: new Date() };
+		return { asset, price: assetsInverted[asset] ? 1.0 / price : price, date: new Date() };
 	}
 }
