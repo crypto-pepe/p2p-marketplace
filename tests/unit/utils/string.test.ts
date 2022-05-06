@@ -12,6 +12,6 @@ const testValue: {
 
 const result: string = '734513.321000';
 
-test('BigInt value should be correct convert to string', () => {
+test('BigInt value should be correct convert to float string', () => {
   expect(bigIntToFloatString(testValue.value, testValue.decimals, testValue.separator)).toEqual(result);
 });
