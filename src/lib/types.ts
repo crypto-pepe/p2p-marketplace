@@ -26,5 +26,5 @@ export type Link = {
 	title?: string;
 	href: string;
 	referrerpolicy?: string;
-	target?: string;
+	target?: '_blank' | '_self' | '_parent' | '_top';
 };

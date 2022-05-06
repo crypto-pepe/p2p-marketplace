@@ -24,6 +24,7 @@
 	let modal: Modal;
 	let step: Step = $wallet.isConnected ? Step.account : Step.connect;
 	let connectionError: ConnectionError | undefined;
+	let walletTypeInstall: WalletType = 'waveskeeper';
 
 	export function show() {
 		connectionError = undefined;
@@ -36,6 +37,7 @@
 	}
 
 	async function connect(walletType: WalletType) {
+		console.log(walletType);
 		if (await getWalletByType(walletType).isAvailable()) {
 			step = Step.connecting;
 			connectionError = undefined;
@@ -46,6 +48,7 @@
 					connectionError = { code: err.code, message: err.message };
 				});
 		} else {
+			walletTypeInstall = walletType;
 			step = Step.wavesKeeperInstall;
 		}
 	}
@@ -81,7 +84,7 @@
 			some text about waiting loader
 		{:else if step === Step.wavesKeeperInstall}
 			<a
-				href={InstallByWallet['waveskeeper'] && InstallByWallet['waveskeeper'].href}
+				href={InstallByWallet[walletTypeInstall].href}
 				referrerpolicy="noopener noreferrer"
 				target="_blank"
 			>
