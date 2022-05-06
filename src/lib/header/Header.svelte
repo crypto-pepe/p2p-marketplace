@@ -33,7 +33,7 @@
 	function buttonDecorator(wallet: Wallet): {
 		title: string;
 	} {
-		return wallet.isConnected ? { title: wallet.address || "Account" } : { title: 'Connect' };
+		return wallet.isConnected ? { title: wallet.address || 'Account' } : { title: 'Connect' };
 	}
 </script>
 
@@ -43,11 +43,10 @@
 	$: buttonArgs = buttonDecorator($wallet);
 	$: isConnected = $wallet.isConnected;
 
-	$: getVisibleLinks = (): Link[] => {
-		return navLinks.filter((link) =>
+	$: getVisibleLinks = (): Link[] =>
+		navLinks.filter((link) =>
 			isConnected ? link : link.href !== '/account' && link.href !== '/exchanges'
 		);
-	};
 </script>
 
 <header class="header">
