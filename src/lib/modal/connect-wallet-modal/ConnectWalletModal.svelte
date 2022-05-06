@@ -37,7 +37,6 @@
 	}
 
 	async function connect(walletType: WalletType) {
-		console.log(walletType);
 		if (await getWalletByType(walletType).isAvailable()) {
 			step = Step.connecting;
 			connectionError = undefined;
