@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$lib/form';
-	import { scale } from 'svelte/transition';
-	import { flip } from 'svelte/animate';
 </script>
 
 <svelte:head>

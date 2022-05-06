@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-static';
 import preprocess from 'svelte-preprocess';
 import childProcess from 'child_process';
 
@@ -18,7 +18,10 @@ const config = {
 
 		vite: {
 			define: {
-				__GIT_VERSION__: `'${childProcess.execSync('git rev-parse --short HEAD').toString().trim()}'`,
+				__GIT_VERSION__: `'${childProcess
+					.execSync('git rev-parse --short HEAD')
+					.toString()
+					.trim()}'`,
 				__GIT_COMMITHASH__: `'${childProcess.execSync('git rev-parse HEAD').toString().trim()}'`
 			}
 		}
