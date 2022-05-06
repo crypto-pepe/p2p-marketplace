@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	import type { Wallet } from '../../stores/wallet';
-	import type { Link } from 'src/types';
+	import type { Link } from 'src/lib/types';
 	import { wallet } from '../../stores/wallet';
 	import NavBar from './navbar/NavBar.svelte';
 	import ConnectWalletModal from '../modal/connect-wallet-modal/ConnectWalletModal.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts" constext="module">
-	import type { Link } from 'src/types';
+	import type { Link } from 'src/lib/types';
 
 	const SocialItems: Link[] = [
 		{

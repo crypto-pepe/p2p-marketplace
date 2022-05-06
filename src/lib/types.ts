@@ -1,3 +1,5 @@
+import type { SvelteComponent } from 'svelte';
+
 export enum CryptoAsset {
 	BTC = 'BTC',
 	ETH = 'ETH',
@@ -17,3 +19,12 @@ export type Price = {
 	timestamp: Date;
 };
 export type PricesMap = Partial<Record<Asset, Price>>;
+
+
+export type Link = {
+	content: string | SvelteComponent;
+	title?: string;
+	href: string;
+	referrerpolicy?: string;
+	target?: string;
+};
