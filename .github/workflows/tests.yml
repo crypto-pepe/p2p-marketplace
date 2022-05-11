@@ -41,6 +41,9 @@ jobs:
       
       - name: Install dependencies
         run: pnpm install
+
+      - name: Install playwright dependecies
+        run: playwright install
         
       - name: Run unit tests
         run: pnpm run test
