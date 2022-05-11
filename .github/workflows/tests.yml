@@ -43,7 +43,7 @@ jobs:
         run: pnpm install
 
       - name: Install playwright dependecies
-        run: ./node_modules/.bin/playwright install
+        run: npx playwright install-deps
         
       - name: Run unit tests
         run: pnpm run test
