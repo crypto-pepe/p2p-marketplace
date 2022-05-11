@@ -11,8 +11,6 @@ const wavesKeeperRequestWrapper = (): Promise<any> => {
   return window.WavesKeeper.initialPromise;
 };
 
-let changedCallback: Function | undefined;
-
 export class WavesKeeperWalletProvider implements IWalletProvider {
   constructor() {
     window.WavesKeeper?.initialPromise.then((keeper) =>
@@ -20,16 +18,18 @@ export class WavesKeeperWalletProvider implements IWalletProvider {
     );
   }
 
+  changedCallback: (() => void) | undefined;
+
   onWavesChanged() {
-    changedCallback && changedCallback();
+    this.changedCallback && this.changedCallback();
   }
 
-  onChanged(callback: Function) {
-    changedCallback = callback;
+  onChanged(callback: () => void) {
+    this.changedCallback = callback;
   }
 
-  onDisconnect(callback: Function) {
-    changedCallback = undefined;
+  onDisconnect(callback: () => void) {
+    this.changedCallback = undefined;
   }
 
   isAvailable(): Promise<boolean> {

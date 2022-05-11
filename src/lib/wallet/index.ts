@@ -5,8 +5,8 @@ export type AssetInfo =
   }
 
 export default interface IWallet {
-  onChanged(callback: Function): void;
-  onDisconnect(callback?: Function): void;
+  onChanged(callback: () => void): void;
+  onDisconnect(callback?: () => void): void;
   isAvailable(): Promise<boolean>;
   getAddress(): Promise<string>;
   getNetwork(): Promise<string>;
