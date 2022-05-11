@@ -24,7 +24,7 @@ jobs:
         id: pnpm-install
         with:
           version: 7
-          run_install: false      
+          run_install: false
           
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -43,7 +43,7 @@ jobs:
         run: pnpm install
 
       - name: Install playwright dependecies
-        run: npx playwright install-deps
+        run: npx playwright install
         
       - name: Run unit tests
         run: pnpm run test
