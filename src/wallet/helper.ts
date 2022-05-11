@@ -1,14 +1,10 @@
 import type IWalletProvider from "./";
-import type { WalletType } from "../stores/wallet";
+import type { WalletType } from "src/stores/wallet";
 import { WavesKeeperWalletProvider } from "./waveskeeper";
 
 enum Blockchain {
   Waves = "waves"
 }
-
-const WalletByType: { [key in WalletType]: IWalletProvider } = {
-  waveskeeper: new WavesKeeperWalletProvider(),
-};
 
 export type ChainInfo = {
   chainId: string;
@@ -26,6 +22,9 @@ const ChainsByWalletType: {
 };
 
 export function getWalletByType(providerType: WalletType) {
+  const WalletByType: { [key in WalletType]: IWalletProvider } = {
+    waveskeeper: new WavesKeeperWalletProvider(),
+  };
   if (providerType in WalletByType) {
     return WalletByType[providerType];
   }

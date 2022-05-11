@@ -1,6 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 import preprocess from 'svelte-preprocess';
 import childProcess from 'child_process';
+import path, { resolve } from 'path';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -23,6 +24,11 @@ const config = {
 					.toString()
 					.trim()}'`,
 				__GIT_COMMITHASH__: `'${childProcess.execSync('git rev-parse HEAD').toString().trim()}'`
+			},
+			resolve: {
+				alias: {
+					src: path.resolve('./src')
+				}
 			}
 		}
 	}

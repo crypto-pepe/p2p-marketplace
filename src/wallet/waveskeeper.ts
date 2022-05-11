@@ -11,36 +11,12 @@ const wavesKeeperRequestWrapper = (): Promise<any> => {
 
 const isAvailable = (): boolean => window.WavesKeeper !== undefined;
 
-const getAddress = (): Promise<string> =>
-  wavesKeeperRequestWrapper()
-    .then((keeper) => keeper.publicState())
-    .then((state) => state.account.address);
-
-const getChainId = (): Promise<string> =>
-  wavesKeeperRequestWrapper()
-    .then((keeper) => keeper.publicState())
-    .then((state) => state.network.code);
-
-const getBalance = (asset?: string): Promise<BigInt> =>
-  wavesKeeperRequestWrapper()
-    .then((keeper) => keeper.publicState())
-    .then((state) => {
-      if (asset) {
-        if (state.account.balance.assets[asset]) {
-          return Promise.resolve(state.account.balance.assets[asset].balance);
-        } else {
-          return Promise.resolve(BigInt(0));
-        }
-      } else {
-        return BigInt(state.account.balance.available);
-      }
-    });
 
 let changedCallback: Function | undefined;
 
 export class WavesKeeperWalletProvider implements IWalletProvider {
   constructor() {
-    window.WavesKeeper.initialPromise.then((keeper) =>
+    window.WavesKeeper?.initialPromise.then((keeper) =>
       keeper.on("update", this.onWavesChanged)
     );
   }
@@ -62,23 +38,35 @@ export class WavesKeeperWalletProvider implements IWalletProvider {
   }
 
   getAddress(): Promise<string> {
-    return getAddress();
+    return wavesKeeperRequestWrapper()
+      .then((keeper) => keeper.publicState())
+      .then((state) => state.account.address);;
   }
 
   getNetwork(): Promise<string> {
-    return getChainId();
+    return wavesKeeperRequestWrapper()
+      .then((keeper) => keeper.publicState())
+      .then((state) => state.network.code);
   }
 
   getAccountBalance(asset?: string): Promise<BigInt> {
-    return getBalance(asset);
+    return wavesKeeperRequestWrapper()
+      .then((keeper) => keeper.publicState())
+      .then((state) => {
+        if (asset) {
+          if (state.account.balance.assets[asset]) {
+            return Promise.resolve(state.account.balance.assets[asset].balance);
+          } else {
+            return Promise.resolve(BigInt(0));
+          }
+        } else {
+          return BigInt(state.account.balance.available);
+        }
+      });
   }
 
   getAssetInfo(asset?: string): Promise<AssetInfo | undefined> {
-    if (asset) {
-      return Promise.resolve(undefined);
-    } else {
-      return Promise.resolve({ decimals: 8, symbol: "WAVES" });
-    }
+    return Promise.resolve(asset ? undefined : { decimals: 8, symbol: "WAVES" });
   }
 
   setChain(chainId: string): Promise<unknown> {

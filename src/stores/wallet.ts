@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
-import { getWalletByType } from "../wallet/helper";
-import { bigIntToFloatString } from "../utils/strings";
+import { getWalletByType } from "src/wallet/helper";
+import { bigIntToFloatString } from "src/utils/strings";
 
 export type WalletType = "waveskeeper";
 

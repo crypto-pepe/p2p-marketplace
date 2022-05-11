@@ -1,9 +1,9 @@
 <script lang="ts" context="module">
-	import type { WalletType, ConnectionError } from '../../../stores/wallet';
-	import { wallet, connectWallet, disconnectWallet } from '../../../stores/wallet';
+	import type { WalletType, ConnectionError } from 'src/stores/wallet';
+	import { wallet, connectWallet, disconnectWallet } from 'src/stores/wallet';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { getWalletByType } from '../../../wallet/helper';
+	import { getWalletByType } from 'src/wallet/helper';
 	import Modal from '../Modal.svelte';
 
 	enum Step {
@@ -28,11 +28,7 @@
 
 	export function show() {
 		connectionError = undefined;
-		if ($wallet.isConnected) {
-			step = Step.account;
-		} else {
-			step = Step.connect;
-		}
+		step = $wallet.isConnected ? Step.account : Step.connect;
 		modal && modal.openModal();
 	}
 
