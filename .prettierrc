@@ -1,6 +1,16 @@
 {
+<<<<<<< HEAD
 	"useTabs": false,
 	"singleQuote": true,
 	"trailingComma": "none",
 	"printWidth": 100
 }
+=======
+  "useTabs": false,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "printWidth": 100,
+	"bracketSpacing": true,
+	"tabWidth": 2
+}
+>>>>>>> 92fd7b70bf8a39e531d9510ed21a26df1cdb9732
