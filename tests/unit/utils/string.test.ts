@@ -1,4 +1,4 @@
-import { bigIntToFloatString } from "src/utils/strings";
+import { bigIntToFloatString } from "src/lib/utils/strings";
 
 const testValue:BigInt = 734513321000n;
 

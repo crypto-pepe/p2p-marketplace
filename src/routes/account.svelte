@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
 	import { browser, dev } from '$app/env';
 	import { goto } from '$app/navigation';
-	import { wallet } from '../stores/wallet';
+	import { wallet } from '$lib/stores/wallet';
 	import { onMount } from 'svelte';
 
 	// we don't need any JS on this page, though we'll load

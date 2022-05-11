@@ -1,5 +1,7 @@
-import type IWalletProvider from "./";
-import type { AssetInfo } from "./";
+import type IWalletProvider from ".";
+import type { AssetInfo } from ".";
+
+const isAvailable = (): boolean => window.WavesKeeper !== undefined;
 
 const wavesKeeperRequestWrapper = (): Promise<any> => {
   if (!isAvailable()) {
@@ -8,9 +10,6 @@ const wavesKeeperRequestWrapper = (): Promise<any> => {
 
   return window.WavesKeeper.initialPromise;
 };
-
-const isAvailable = (): boolean => window.WavesKeeper !== undefined;
-
 
 let changedCallback: Function | undefined;
 

@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { wallet } from '../stores/wallet';
+	import { wallet } from '$lib/stores/wallet';
 </script>
 
 <script lang="ts">

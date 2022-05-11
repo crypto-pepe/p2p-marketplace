@@ -1,5 +1,5 @@
-import type IWalletProvider from "./";
-import type { WalletType } from "src/stores/wallet";
+import type IWalletProvider from ".";
+import type { WalletType } from "$lib/stores/wallet";
 import { WavesKeeperWalletProvider } from "./waveskeeper";
 
 enum Blockchain {

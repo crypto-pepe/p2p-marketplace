@@ -1,9 +1,9 @@
 <script lang="ts" context="module">
-	import type { Wallet } from 'src/stores/wallet';
+	import type { Wallet } from '$lib/stores/wallet';
 	import type { Link } from '$lib/types';
-	import { wallet } from 'src/stores/wallet';
+	import { wallet } from '$lib/stores/wallet';
 	import NavBar from './navbar/NavBar.svelte';
-	import ConnectWalletModal from '$lib/modal/connect-wallet-modal/ConnectWalletModal.svelte';
+	import ConnectWalletModal from '../modal/connect-wallet-modal/ConnectWalletModal.svelte';
 
 	const navLinks: Link[] = [
 		{

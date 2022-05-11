@@ -1,9 +1,9 @@
 <script lang="ts" context="module">
-	import type { WalletType, ConnectionError } from 'src/stores/wallet';
-	import { wallet, connectWallet, disconnectWallet } from 'src/stores/wallet';
+	import type { WalletType, ConnectionError } from '$lib/stores/wallet';
+	import { wallet, connectWallet, disconnectWallet } from '$lib/stores/wallet';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { getWalletByType } from 'src/wallet/helper';
+	import { getWalletByType } from '$lib/wallet/helper';
 	import Modal from '../Modal.svelte';
 
 	enum Step {
