@@ -1,5 +1,5 @@
 import type IWalletProvider from ".";
-import type { AssetInfo } from ".";
+import type { WalletType } from "../stores/wallet";
 
 const isAvailable = (): boolean => window.WavesKeeper !== undefined;
 
@@ -7,68 +7,70 @@ const wavesKeeperRequestWrapper = (): Promise<any> => {
   if (!isAvailable()) {
     return Promise.reject();
   }
-
   return window.WavesKeeper.initialPromise;
 };
 
-export class WavesKeeperWalletProvider implements IWalletProvider {
+type ConnectionConfig = {
+}
+
+export class WavesKeeperWalletProvider implements IWalletProvider<ConnectionConfig> {
   constructor() {
-    window.WavesKeeper?.initialPromise.then((keeper) =>
-      keeper.on("update", this.onWavesChanged)
+    window.WavesKeeper?.initialPromise.then((keeper) => {
+      keeper.on("update", (state: WavesKeeper.IPublicStateResponse) => { console.log(state) })
+    }
     );
   }
 
-  changedCallback: (() => void) | undefined;
+  changeCallback: (() => void) | undefined;
+  connectCallback: (() => void) | undefined;
+  disconnectCallback: (() => void) | undefined;
 
   onWavesChanged() {
-    this.changedCallback && this.changedCallback();
+    this.changeCallback && this.changeCallback();
+  }
+  
+  connect(): Promise<any> {
+    return Promise.resolve()
+  }
+  
+  //Need Promise type change
+  sign(bytes: Uint8Array): Promise<any> {
+    return Promise.resolve(() => { throw new Error("Sign error") })
+  }
+  
+  getType(): WalletType {
+    return 'waveskeeper';
   }
 
-  onChanged(callback: () => void) {
-    this.changedCallback = callback;
+  onConnect(callback: () => void) {
+    this.connectCallback = callback;
+  }
+
+  onChange(callback: () => void) {
+    this.changeCallback = callback;
   }
 
   onDisconnect(callback: () => void) {
-    this.changedCallback = undefined;
+    this.disconnectCallback = callback;
   }
 
   isAvailable(): Promise<boolean> {
     return Promise.resolve(isAvailable());
   }
 
-  getAddress(): Promise<string> {
+  getAddress(): Promise<any> {
     return wavesKeeperRequestWrapper()
       .then((keeper) => keeper.publicState())
-      .then((state) => state.account.address);;
+      .then((state) => state.account.address)
   }
 
-  getNetwork(): Promise<string> {
-    return wavesKeeperRequestWrapper()
-      .then((keeper) => keeper.publicState())
-      .then((state) => state.network.code);
+  //Need Promise type change
+  getPublicKey(): Promise<any> {
+    return Promise.resolve(() => { throw new Error("Public key error") })
   }
 
-  getAccountBalance(asset?: string): Promise<BigInt> {
-    return wavesKeeperRequestWrapper()
-      .then((keeper) => keeper.publicState())
-      .then((state) => {
-        if (asset) {
-          if (state.account.balance.assets[asset]) {
-            return Promise.resolve(state.account.balance.assets[asset].balance);
-          } else {
-            return Promise.resolve(BigInt(0));
-          }
-        } else {
-          return BigInt(state.account.balance.available);
-        }
-      });
-  }
-
-  getAssetInfo(asset?: string): Promise<AssetInfo | undefined> {
-    return Promise.resolve(asset ? undefined : { decimals: 8, symbol: "WAVES" });
-  }
-
-  setChain(chainId: string): Promise<unknown> {
-    return Promise.reject(new Error("WavesKeeper set chainId manually only"));
+  //Need Promise type change
+  getChainId(): Promise<any> {
+    return Promise.resolve(() => { throw new Error("Chain id error") })
   }
 }

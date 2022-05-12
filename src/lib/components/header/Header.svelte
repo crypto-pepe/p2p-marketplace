@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
-	import type { Wallet } from '$lib/stores/wallet';
+	import type { WalletState } from '$lib/stores/wallet';
 	import type { Link } from '$lib/types';
-	import { wallet } from '$lib/stores/wallet';
+	import { walletStore } from '$lib/stores/wallet';
 	import NavBar from './navbar/NavBar.svelte';
 	import ConnectWalletModal from '../modal/connect-wallet-modal/ConnectWalletModal.svelte';
 
@@ -30,7 +30,7 @@
 		}
 	];
 
-	function buttonDecorator(wallet: Wallet): {
+	function buttonDecorator(wallet: WalletState): {
 		title: string;
 	} {
 		return wallet.isConnected ? { title: wallet.address || 'Account' } : { title: 'Connect' };
@@ -40,8 +40,8 @@
 <script lang="ts">
 	let connectWalletModal: ConnectWalletModal;
 
-	$: buttonArgs = buttonDecorator($wallet);
-	$: isConnected = $wallet.isConnected;
+	$: buttonArgs = buttonDecorator($walletStore);
+	$: isConnected = $walletStore.isConnected;
 
 	$: getVisibleLinks = (): Link[] =>
 		navLinks.filter((link) =>

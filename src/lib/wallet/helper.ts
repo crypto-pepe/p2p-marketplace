@@ -1,6 +1,7 @@
 import type IWalletProvider from ".";
 import type { WalletType } from "$lib/stores/wallet";
 import { WavesKeeperWalletProvider } from "./waveskeeper";
+import { memoize } from "$lib/utils/memoize";
 
 enum Blockchain {
   Waves = "waves"
@@ -21,8 +22,8 @@ const ChainsByWalletType: {
   ],
 };
 
-export function getWalletByType(providerType: WalletType) {
-  const WalletByType: { [key in WalletType]: IWalletProvider } = {
+function _getWalletByType(providerType: WalletType): IWalletProvider<unknown> {
+  const WalletByType: { [key in WalletType]: IWalletProvider<unknown> } = {
     waveskeeper: new WavesKeeperWalletProvider(),
   };
   if (providerType in WalletByType) {
@@ -31,6 +32,9 @@ export function getWalletByType(providerType: WalletType) {
 
   throw new Error("provider type is not valid");
 }
+
+export const getWalletByType = memoize(_getWalletByType);
+
 
 export function getAvailableChains(walletType: WalletType): ChainInfo[] {
   return ChainsByWalletType[walletType];

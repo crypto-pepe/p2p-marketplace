@@ -1,51 +1,73 @@
 import { writable } from "svelte/store";
-import { getWalletByType } from "$lib/wallet/helper";
-import { bigIntToFloatString } from "$lib/utils/strings";
+import type IWallet from "../wallet";
 
 export type WalletType = "waveskeeper";
 
-export type Wallet = {
-  isConnected: boolean;
-  type?: WalletType;
-  address?: string;
-  network?: string;
-  balance?: number;
+type DisconnectedWalletState = {
+  isConnected: false;
 };
+
+export type WalletInfoState = {
+  type: WalletType;
+  address: string;
+}
+
+export type ConnectedWalletState = {
+  isConnected: true,
+} & WalletInfoState;
+
+export type WalletState = DisconnectedWalletState | ConnectedWalletState;
 
 export type ConnectionError = {
   code: number;
   message: string;
 };
 
-const DefaultWalletState: Wallet = { isConnected: false };
-const { subscribe, update } = writable<Wallet>({ ...DefaultWalletState });
+const DefaultWalletState: WalletState = { isConnected: false };
+const { subscribe, update } = writable<WalletState>({ ...DefaultWalletState });
 
-export async function connectWallet(walletType: WalletType) {
-  const wallet = getWalletByType(walletType);
-  const [address, network, balance, asset] = await Promise.all([
-    wallet.getAddress(),
-    wallet.getNetwork(),
-    wallet.getAccountBalance(),
-    wallet.getAssetInfo(),
-  ]);
+export async function connectWallet(wallet: IWallet<unknown>) {
+  wallet.onConnect(async () => {
+    const address = await wallet.getAddress();
+    const type = wallet.getType();
+    localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
+    update(() => ({
+      isConnected: true,
+      address,
+      type
+    }));
+  });
+
+  wallet.onChange(async () => {
+    const address = await wallet.getAddress();
+    const type = wallet.getType();
+    localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
+    update(() => ({
+      isConnected: true,
+      address,
+      type
+    }));
+  })
+
+  wallet.onDisconnect(() => {
+    localStorage.removeItem('connectedWallet');
+    update(() => DefaultWalletState);
+  });
+
+  const address = await wallet.getAddress();
+  const type = wallet.getType();
+  localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
 
   update(() => ({
     isConnected: true,
     address,
-    type: walletType,
-    network,
-    balance: parseFloat(
-      asset ? bigIntToFloatString(balance, asset.decimals) : balance.toString()
-    ),
+    type
   }));
-
-  wallet.onChanged(() => connectWallet(walletType));
 }
 
-export async function disconnectWallet(walletType: WalletType) {
-  const wallet = getWalletByType(walletType);
-  wallet && wallet.onDisconnect();
+export async function disconnectWallet() {
+  localStorage.removeItem('connectedWallet');
   update(() => DefaultWalletState);
 }
 
-export const wallet = { subscribe };
+export const walletStore = { subscribe };
