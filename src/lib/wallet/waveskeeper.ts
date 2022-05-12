@@ -13,10 +13,19 @@ const wavesKeeperRequestWrapper = (): Promise<any> => {
 type ConnectionConfig = {
 }
 
+
+
 export class WavesKeeperWalletProvider implements IWalletProvider<ConnectionConfig> {
   constructor() {
     window.WavesKeeper?.initialPromise.then((keeper) => {
-      keeper.on("update", (state: WavesKeeper.IPublicStateResponse) => { console.log(state) })
+      keeper.on("update", (state: WavesKeeper.IPublicStateResponse) => {
+        if (state.account === null) {
+          this.disconnectCallback && this.disconnectCallback()
+          console.log("Disconnect");
+        }
+        this.changeCallback && this.changeCallback();
+
+      })
     }
     );
   }
@@ -28,16 +37,16 @@ export class WavesKeeperWalletProvider implements IWalletProvider<ConnectionConf
   onWavesChanged() {
     this.changeCallback && this.changeCallback();
   }
-  
+
   connect(): Promise<any> {
     return Promise.resolve()
   }
-  
+
   //Need Promise type change
   sign(bytes: Uint8Array): Promise<any> {
     return Promise.resolve(() => { throw new Error("Sign error") })
   }
-  
+
   getType(): WalletType {
     return 'waveskeeper';
   }
@@ -58,19 +67,24 @@ export class WavesKeeperWalletProvider implements IWalletProvider<ConnectionConf
     return Promise.resolve(isAvailable());
   }
 
-  getAddress(): Promise<any> {
+  getAddress(): Promise<string> {
     return wavesKeeperRequestWrapper()
       .then((keeper) => keeper.publicState())
       .then((state) => state.account.address)
   }
 
-  //Need Promise type change
-  getPublicKey(): Promise<any> {
-    return Promise.resolve(() => { throw new Error("Public key error") })
+  getPublicKey(): Promise<string> {
+    return wavesKeeperRequestWrapper()
+      .then((keeper) => keeper.publicState())
+      .then((state) => state.account.publicKey)
   }
 
-  //Need Promise type change
-  getChainId(): Promise<any> {
-    return Promise.resolve(() => { throw new Error("Chain id error") })
+  getChainId(): Promise<string> {
+    return wavesKeeperRequestWrapper()
+      .then((keeper) => keeper.publicState())
+      .then((state) => state.network.code)
   }
 }
+
+
+// february gas hover siege original number margin filter ceiling collect loyal license suffer then lawn

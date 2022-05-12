@@ -10,6 +10,7 @@
     account = 'Account',
     connect = 'Connect',
     connecting = 'Connecting...',
+    error = 'Error',
     wavesKeeperInstall = 'Install WavesKeeper'
   }
 
@@ -40,7 +41,7 @@
       await connectWallet(wallet)
         .then(modal.closeModal)
         .catch((err) => {
-          step = Step.connect;
+          step = Step.error;
           connectionError = { code: err.code, message: err.message };
         });
     } else {
@@ -83,6 +84,8 @@
       >
         Install
       </a>
+    {:else if step === Step.error}
+      <h3>{connectionError?.message}</h3>
     {/if}
   </div>
 </Modal>
