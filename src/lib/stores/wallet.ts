@@ -28,25 +28,39 @@ const { subscribe, update } = writable<WalletState>({ ...DefaultWalletState });
 
 export async function connectWallet(wallet: IWallet<unknown>) {
   wallet.onConnect(async () => {
-    const address = await wallet.getAddress();
-    const type = wallet.getType();
-    localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
-    update(() => ({
-      isConnected: true,
-      address,
-      type
-    }));
+    try {
+      const address = await wallet.getAddress();
+      const type = wallet.getType();
+      localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
+      update(() => ({
+        isConnected: true,
+        address,
+        type
+      }));
+    }
+    catch {
+      update(() => ({
+        isConnected: false,
+      }));
+    }
   });
 
   wallet.onChange(async () => {
-    const address = await wallet.getAddress();
-    const type = wallet.getType();
-    localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
-    update(() => ({
-      isConnected: true,
-      address,
-      type
-    }));
+    try {
+      const address = await wallet.getAddress();
+      const type = wallet.getType();
+      localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
+      update(() => ({
+        isConnected: true,
+        address,
+        type
+      }));
+    }
+    catch {
+      update(() => ({
+        isConnected: false,
+      }));
+    }
   })
 
   wallet.onDisconnect(() => {

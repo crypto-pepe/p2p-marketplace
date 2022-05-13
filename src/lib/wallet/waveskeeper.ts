@@ -10,36 +10,37 @@ const wavesKeeperRequestWrapper = (): Promise<any> => {
   return window.WavesKeeper.initialPromise;
 };
 
-type ConnectionConfig = {
-}
-
-
-
-export class WavesKeeperWalletProvider implements IWalletProvider<ConnectionConfig> {
+export class WavesKeeperWalletProvider implements IWalletProvider<unknown> {
   constructor() {
     window.WavesKeeper?.initialPromise.then((keeper) => {
+      this.previousPublicState = keeper.publicState();
       keeper.on("update", (state: WavesKeeper.IPublicStateResponse) => {
-        if (state.account === null) {
-          this.disconnectCallback && this.disconnectCallback()
-          console.log("Disconnect");
+        if (this.previousPublicState) {
+          if (this.previousPublicState?.account !== null && state.account === null) {
+            this.disconnectCallback && this.disconnectCallback();
+          } else if (this.previousPublicState?.account === null && state.account !== null) {
+            this.connectCallback && this.connectCallback();
+          } else {
+            this.changeCallback && this.changeCallback();
+          }
+        } else if (!this.previousPublicState && state.account !== null) {
+          this.connectCallback && this.connectCallback();
+        } else {
+          this.changeCallback && this.changeCallback();
         }
-        this.changeCallback && this.changeCallback();
-
+        this.previousPublicState = state;
       })
-    }
-    );
+    });
   }
+
+  previousPublicState: WavesKeeper.IPublicStateResponse | undefined = undefined;
 
   changeCallback: (() => void) | undefined;
   connectCallback: (() => void) | undefined;
   disconnectCallback: (() => void) | undefined;
 
-  onWavesChanged() {
-    this.changeCallback && this.changeCallback();
-  }
-
   connect(): Promise<any> {
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   //Need Promise type change
@@ -51,15 +52,15 @@ export class WavesKeeperWalletProvider implements IWalletProvider<ConnectionConf
     return 'waveskeeper';
   }
 
-  onConnect(callback: () => void) {
+  async onConnect(callback: () => void) {
     this.connectCallback = callback;
   }
 
-  onChange(callback: () => void) {
+  async onChange(callback: () => void) {
     this.changeCallback = callback;
   }
 
-  onDisconnect(callback: () => void) {
+  async onDisconnect(callback: () => void) {
     this.disconnectCallback = callback;
   }
 
@@ -85,6 +86,3 @@ export class WavesKeeperWalletProvider implements IWalletProvider<ConnectionConf
       .then((state) => state.network.code)
   }
 }
-
-
-// february gas hover siege original number margin filter ceiling collect loyal license suffer then lawn

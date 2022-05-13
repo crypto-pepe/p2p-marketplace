@@ -22,10 +22,17 @@
 </script>
 
 <script lang="ts">
+  $: step = $walletStore.isConnected ? Step.account : Step.connect;
   let modal: Modal;
-  let step: Step = $walletStore.isConnected ? Step.account : Step.connect;
   let connectionError: ConnectionError | undefined;
   let walletTypeInstall: WalletType = 'waveskeeper';
+	let prevConnetionState: boolean = $walletStore.isConnected;
+
+	walletStore.subscribe(({ isConnected }) => {
+    if (prevConnetionState !== isConnected) {
+      modal.closeModal();
+    }
+  });
 
   export function show() {
     connectionError = undefined;
