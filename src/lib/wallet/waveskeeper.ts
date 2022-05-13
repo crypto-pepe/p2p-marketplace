@@ -52,15 +52,15 @@ export class WavesKeeperWalletProvider implements IWalletProvider<unknown> {
     return 'waveskeeper';
   }
 
-  async onConnect(callback: () => void) {
+  onConnect(callback: () => void) {
     this.connectCallback = callback;
   }
 
-  async onChange(callback: () => void) {
+  onChange(callback: () => void) {
     this.changeCallback = callback;
   }
 
-  async onDisconnect(callback: () => void) {
+  onDisconnect(callback: () => void) {
     this.disconnectCallback = callback;
   }
 
