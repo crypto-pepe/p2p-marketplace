@@ -1,7 +1,8 @@
+import type { IPriceOracle, Price } from '$lib/oracles/prices';
 import { readable } from 'svelte/store';
 import type { PricesMap } from '$lib/types';
 import { PRICE_ORACLE_ASSETS, PRICE_ORACLE_INTERVAL_IN_MILLIS } from '$lib/constants';
-import { fetchPrice, type IPriceOracle, type Price } from '$lib/oracles/prices';
+import { fetchPrice } from '$lib/oracles/prices';
 import { BinancePriceOracle } from '$lib/oracles/prices/binance';
 
 const oracles: IPriceOracle[] = [new BinancePriceOracle()];

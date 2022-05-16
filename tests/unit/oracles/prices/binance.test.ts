@@ -1,6 +1,7 @@
+import type { Asset } from 'src/lib/types';
 import fetchMock from 'jest-fetch-mock';
 import { BinancePriceOracle } from 'src/lib/oracles/prices/binance';
-import { type Asset, CryptoAsset, FiatAsset } from 'src/lib/types';
+import { CryptoAsset, FiatAsset } from 'src/lib/types';
 
 const expectedPrices: [Asset, boolean][] = [
 	[CryptoAsset.BTC, true],

@@ -1,5 +1,6 @@
-import { CryptoAsset, FiatAsset, type Asset } from '$lib/types';
 import type { Price, IPriceOracle } from './';
+import type { Asset } from '$lib/types';
+import { CryptoAsset, FiatAsset } from '$lib/types';
 
 type BinanceResponse = {
 	lastPrice: string;

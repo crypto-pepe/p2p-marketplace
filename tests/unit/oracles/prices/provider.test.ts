@@ -1,4 +1,5 @@
-import { type Price, fetchPrice } from 'src/lib/oracles/prices';
+import type { Price } from 'src/lib/oracles/prices';
+import { fetchPrice } from 'src/lib/oracles/prices';
 import { CryptoAsset } from 'src/lib/types';
 
 const stubPrice: Price = { asset: CryptoAsset.BTC, timestamp: new Date(1000000), price: 1223.54 };
