@@ -23,7 +23,7 @@ const config = {
 					.toString()
 					.trim()}'`,
 				__GIT_COMMITHASH__: `'${childProcess.execSync('git rev-parse HEAD').toString().trim()}'`
-			}
+			},
 		}
 	}
 };
