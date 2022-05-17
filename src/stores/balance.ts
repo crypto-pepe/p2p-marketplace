@@ -25,7 +25,6 @@ export const balance = readable(state, (set) => {
     const reader = balanceService.subscribe(BalanceType.wallet, AssetIds.USDN);
     while (true) {
       const { done, value } = await reader.read();
-      console.log(value);
       set({
         usdn: {
           walletBalance: value ? value : BigInt(0)
