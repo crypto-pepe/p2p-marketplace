@@ -1,6 +1,9 @@
 <script lang="ts" context="module">
-	import type { Link } from 'src/types';
+	import type { WalletState } from '$lib/stores/wallet';
+	import type { Link } from '$lib/types';
+	import { walletStore } from '$lib/stores/wallet';
 	import NavBar from './navbar/NavBar.svelte';
+	import ConnectWalletModal from '../modal/connect-wallet-modal/ConnectWalletModal.svelte';
 
 	const navLinks: Link[] = [
 		{
@@ -26,26 +29,34 @@
 			referrerpolicy: 'noopener noreferrer'
 		}
 	];
+
+	function buttonDecorator(wallet: WalletState): {
+		title: string;
+	} {
+		return wallet.isConnected ? { title: wallet.address || 'Account' } : { title: 'Connect' };
+	}
 </script>
 
 <script lang="ts">
-	//get value from store
-	let isConnected: boolean = false;
+	let connectWalletModal: ConnectWalletModal;
 
-	const getVisibleLinks = (): Link[] => {
-		return navLinks.filter((link) =>
+	$: buttonArgs = buttonDecorator($walletStore);
+	$: isConnected = $walletStore.isConnected;
+
+	$: getVisibleLinks = (): Link[] =>
+		navLinks.filter((link) =>
 			isConnected ? link : link.href !== '/account' && link.href !== '/exchanges'
 		);
-	};
 </script>
 
 <header class="header">
 	<div class="header__logo">Logo</div>
 	<NavBar navLinks={getVisibleLinks()} />
 	<div class="header__button">
-		<button>Connect</button>
+		<button on:click={connectWalletModal.show}>{buttonArgs.title}</button>
 	</div>
 </header>
+<ConnectWalletModal bind:this={connectWalletModal} />
 
 <style>
 </style>
