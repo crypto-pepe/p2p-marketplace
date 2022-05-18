@@ -1,6 +1,6 @@
-import type { INodeClient } from 'src/lib/services/balance';
+import type { INodeClient } from '$lib/services/node-client';
 import { readable } from 'svelte/store';
-import { WavesHttpNodeClient } from '$lib/services/balance/node-clients';
+import { WavesHttpNodeClient } from 'src/lib/services/node-client/node-clients';
 import { BalanceService, BalanceType } from '$lib/services/balance/balance-service';
 
 const address: string = 'address';

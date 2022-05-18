@@ -1,4 +1,5 @@
-import type { IAssetService, INodeClient } from ".";
+import type { IAssetService } from ".";
+import type { INodeClient } from "$lib/services/node-client";
 
 export type AssetInfo = {
   decimals: number;
