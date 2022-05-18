@@ -1,4 +1,5 @@
-import type { INodeClient, IBalanceService } from '.';
+import type { IBalanceService } from '.';
+import type { INodeClient } from '$lib/services/node-client';
 import { BALANCE_SERVICE_INTERVAL_IN_MILLIS } from '$lib/constants';
 
 export enum BalanceType {
