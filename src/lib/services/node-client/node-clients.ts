@@ -1,12 +1,12 @@
-import type { INodeClient } from "$lib/services/node-client";
-import type { AssetInfo } from '$lib/services/asset-info/asset-service';
+import type { INodeClient } from '$lib/services/node-client';
+import type { AssetInfo } from 'src/lib/services/assets/assets-service';
 
 type WavesHttpNodeClientCofig = {
-  baseUrl: string
-}
+  baseUrl: string;
+};
 
 export class WavesHttpNodeClient implements INodeClient {
-  constructor(private readonly config: WavesHttpNodeClientCofig) { }
+  constructor(private readonly config: WavesHttpNodeClientCofig) {}
 
   getAddressBalance(address: string, assetId: string): Promise<bigint> {
     return fetch(`${this.config.baseUrl}/assets/balance/${address}/${assetId}`)

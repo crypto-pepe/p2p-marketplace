@@ -1,6 +1,6 @@
-import type { AssetInfo } from "../asset-info/asset-service";
+import type { AssetInfo } from '../assets/assets-service';
 
 export interface INodeClient {
   getAddressBalance(address: string, assetId: string): Promise<BigInt>;
-  getAssetDetails(assetId: string): Promise<AssetInfo>
+  getAssetDetails(assetId: string): Promise<AssetInfo>;
 }

@@ -1,18 +1,18 @@
 import type { IBalanceService } from '.';
 import type { INodeClient } from '$lib/services/node-client';
-import { BALANCE_SERVICE_INTERVAL_IN_MILLIS } from '$lib/constants';
+import { BALANCE_SERVICE_REFRESHING_INTERVAL_IN_MILLIS } from '$lib/constants';
 
 export enum BalanceType {
   wallet = 'wallet',
   inOrders = 'inOrders',
   lockedInOrders = 'lockedInOrders'
-};
-
-type TReadableStream<T> = {
-  getReader: () => ReadableStreamDefaultReader<T>
 }
 
-type ReadableStreamBuilder<T> = (cb: () => Promise<any>) => TReadableStream<T>
+type TReadableStream<T> = {
+  getReader: () => ReadableStreamDefaultReader<T>;
+};
+
+type ReadableStreamBuilder<T> = (cb: () => Promise<any>) => TReadableStream<T>;
 
 function readableStreamBuilder(cb: () => Promise<any>): ReadableStream {
   let interval: NodeJS.Timer;
@@ -20,30 +20,28 @@ function readableStreamBuilder(cb: () => Promise<any>): ReadableStream {
     start(controller: ReadableStreamDefaultController) {
       (async () => {
         try {
-          const value = await cb()
+          const value = await cb();
           controller.enqueue(value);
-        }
-        catch {
+        } catch {
           clearInterval(interval);
-          controller.close()
+          controller.close();
         }
-      })()
+      })();
       interval = setInterval(async () => {
         try {
-          const value = await cb()
+          const value = await cb();
           controller.enqueue(value);
-        }
-        catch {
+        } catch {
           clearInterval(interval);
-          controller.close()
+          controller.close();
         }
-      }, BALANCE_SERVICE_INTERVAL_IN_MILLIS);
+      }, BALANCE_SERVICE_REFRESHING_INTERVAL_IN_MILLIS);
     },
 
     cancel() {
       clearInterval(interval);
     }
-  })
+  });
 }
 
 export class BalanceService implements IBalanceService {
@@ -51,7 +49,11 @@ export class BalanceService implements IBalanceService {
   address: string;
   streamBuilder: ReadableStreamBuilder<any>;
 
-  constructor(nodeClient: INodeClient, address: string, streamBuilder: ReadableStreamBuilder<any> = readableStreamBuilder) {
+  constructor(
+    nodeClient: INodeClient,
+    address: string,
+    streamBuilder: ReadableStreamBuilder<any> = readableStreamBuilder
+  ) {
     this.nodeClient = nodeClient;
     this.address = address;
     this.streamBuilder = streamBuilder;
@@ -67,7 +69,9 @@ export class BalanceService implements IBalanceService {
         readableStream = this.streamBuilder(() => Promise.resolve().then(() => 7));
         break;
       default:
-        readableStream = this.streamBuilder(() => this.nodeClient.getAddressBalance(this.address, assetId));
+        readableStream = this.streamBuilder(() =>
+          this.nodeClient.getAddressBalance(this.address, assetId)
+        );
     }
 
     return readableStream.getReader();

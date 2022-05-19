@@ -6,15 +6,15 @@ declare var __GIT_COMMITHASH__: string;
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare namespace App {
-	interface Locals {
-		userid: string;
-	}
+  interface Locals {
+    userid: string;
+  }
 
-	// interface Platform {}
+  // interface Platform {}
 
-	// interface Session {}
+  // interface Session {}
 
-	// interface Stuff {}
+  // interface Stuff {}
 }
 
 interface Window {
@@ -26,7 +26,7 @@ declare var WavesKeeper: WavesKeeper.TWavesKeeperApi;
 declare namespace WavesKeeper {
   type TWavesKeeperApi = {
     publicState(): Promise<IPublicStateResponse>;
-    on(event: "update", cb: (state: IPublicStateResponse) => any): object;
+    on(event: 'update', cb: (state: IPublicStateResponse) => any): object;
     initialPromise: Promise<any>;
   };
 
