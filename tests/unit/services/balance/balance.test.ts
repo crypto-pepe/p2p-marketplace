@@ -1,8 +1,8 @@
 import type { IBalanceService } from 'src/lib/services/balance/index';
-import { WavesHttpNodeClient } from 'src/lib/services/node-client/node-clients';
+import { WavesHttpNodeClient } from 'src/lib/services/node-client/waves-http-node-client';
 import fetchMock from 'jest-fetch-mock';
-import { BalanceService, BalanceType } from 'src/lib/services/balance/balance-service';
-import { AssetService } from 'src/lib/services/assets/assets-service';
+import { BalanceService, BalanceType } from 'src/lib/services/balance';
+import { AssetService } from 'src/lib/services/assets';
 import { ReadableStream } from 'node:stream/web';
 import { BALANCE_SERVICE_REFRESHING_INTERVAL_IN_MILLIS } from 'src/lib/constants';
 

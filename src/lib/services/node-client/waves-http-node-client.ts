@@ -1,5 +1,5 @@
 import type { INodeClient } from '$lib/services/node-client';
-import type { AssetInfo } from 'src/lib/services/assets/assets-service';
+import type { AssetInfo } from 'src/lib/services/assets';
 
 type WavesHttpNodeClientCofig = {
   baseUrl: string;

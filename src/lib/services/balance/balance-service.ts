@@ -1,12 +1,7 @@
 import type { IBalanceService } from '.';
 import type { INodeClient } from '$lib/services/node-client';
+import { BalanceType } from '.';
 import { BALANCE_SERVICE_REFRESHING_INTERVAL_IN_MILLIS } from '$lib/constants';
-
-export enum BalanceType {
-  wallet = 'wallet',
-  inOrders = 'inOrders',
-  lockedInOrders = 'lockedInOrders'
-}
 
 type TReadableStream<T> = {
   getReader: () => ReadableStreamDefaultReader<T>;
