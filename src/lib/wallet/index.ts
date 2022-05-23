@@ -1,10 +1,9 @@
-import type { WalletType } from "../stores/wallet";
+import type { WalletType } from '../stores/wallet';
 
-export type AssetInfo =
-  {
-    decimals: number;
-    symbol: string;
-  }
+export type AssetInfo = {
+  decimals: number;
+  symbol: string;
+};
 
 export default interface IWallet<C> {
   getType(): WalletType;

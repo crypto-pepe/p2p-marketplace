@@ -1,5 +1,5 @@
-import type IWalletProvider from ".";
-import type { WalletType } from "../stores/wallet";
+import type IWalletProvider from '.';
+import type { WalletType } from '../stores/wallet';
 
 const isAvailable = (): boolean => window.WavesKeeper !== undefined;
 
@@ -14,7 +14,7 @@ export class WavesKeeperWalletProvider implements IWalletProvider<unknown> {
   constructor() {
     window.WavesKeeper?.initialPromise.then((keeper) => {
       this.previousPublicState = keeper.publicState();
-      keeper.on("update", (state: WavesKeeper.IPublicStateResponse) => {
+      keeper.on('update', (state: WavesKeeper.IPublicStateResponse) => {
         if (this.previousPublicState) {
           if (this.previousPublicState?.account !== null && state.account === null) {
             this.disconnectCallback && this.disconnectCallback();
@@ -29,7 +29,7 @@ export class WavesKeeperWalletProvider implements IWalletProvider<unknown> {
           this.changeCallback && this.changeCallback();
         }
         this.previousPublicState = state;
-      })
+      });
     });
   }
 
@@ -45,7 +45,9 @@ export class WavesKeeperWalletProvider implements IWalletProvider<unknown> {
 
   //Need Promise type change
   sign(bytes: Uint8Array): Promise<any> {
-    return Promise.resolve(() => { throw new Error("Sign error") })
+    return Promise.resolve(() => {
+      throw new Error('Sign error');
+    });
   }
 
   getType(): WalletType {
@@ -71,18 +73,18 @@ export class WavesKeeperWalletProvider implements IWalletProvider<unknown> {
   getAddress(): Promise<string> {
     return wavesKeeperRequestWrapper()
       .then((keeper) => keeper.publicState())
-      .then((state) => state.account.address)
+      .then((state) => state.account.address);
   }
 
   getPublicKey(): Promise<string> {
     return wavesKeeperRequestWrapper()
       .then((keeper) => keeper.publicState())
-      .then((state) => state.account.publicKey)
+      .then((state) => state.account.publicKey);
   }
 
   getChainId(): Promise<string> {
     return wavesKeeperRequestWrapper()
       .then((keeper) => keeper.publicState())
-      .then((state) => state.network.code)
+      .then((state) => state.network.code);
   }
 }
