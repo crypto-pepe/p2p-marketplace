@@ -1,19 +1,20 @@
-import { writable } from "svelte/store";
-import type IWallet from "../wallet";
+import { writable } from 'svelte/store';
+import type IWallet from '../wallet';
 
-export type WalletType = "waveskeeper";
+export type WalletType = 'waveskeeper';
 
 type DisconnectedWalletState = {
   isConnected: false;
 };
 
 export type WalletInfoState = {
-  type: WalletType;
   address: string;
-}
+  chainId: string;
+  type: WalletType;
+};
 
 export type ConnectedWalletState = {
-  isConnected: true,
+  isConnected: true;
 } & WalletInfoState;
 
 export type WalletState = DisconnectedWalletState | ConnectedWalletState;
@@ -30,17 +31,18 @@ export async function connectWallet(wallet: IWallet<unknown>) {
   wallet.onConnect(async () => {
     try {
       const address = await wallet.getAddress();
+      const chainId = await wallet.getChainId();
       const type = wallet.getType();
       localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
       update(() => ({
         isConnected: true,
         address,
+        chainId,
         type
       }));
-    }
-    catch {
+    } catch {
       update(() => ({
-        isConnected: false,
+        isConnected: false
       }));
     }
   });
@@ -48,20 +50,21 @@ export async function connectWallet(wallet: IWallet<unknown>) {
   wallet.onChange(async () => {
     try {
       const address = await wallet.getAddress();
+      const chainId = await wallet.getChainId();
       const type = wallet.getType();
       localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
       update(() => ({
         isConnected: true,
         address,
+        chainId,
         type
       }));
-    }
-    catch {
+    } catch {
       update(() => ({
-        isConnected: false,
+        isConnected: false
       }));
     }
-  })
+  });
 
   wallet.onDisconnect(() => {
     localStorage.removeItem('connectedWallet');
@@ -69,12 +72,14 @@ export async function connectWallet(wallet: IWallet<unknown>) {
   });
 
   const address = await wallet.getAddress();
+  const chainId = await wallet.getChainId();
   const type = wallet.getType();
   localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
 
   update(() => ({
     isConnected: true,
     address,
+    chainId,
     type
   }));
 }

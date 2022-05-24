@@ -3,7 +3,7 @@ import type { WalletType } from '$lib/stores/wallet';
 import { WavesKeeperWalletProvider } from './waveskeeper';
 import { memoize } from '$lib/utils/memoize';
 
-enum Blockchain {
+export enum Blockchain {
   Waves = 'waves'
 }
 

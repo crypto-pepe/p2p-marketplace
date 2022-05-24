@@ -58,10 +58,10 @@ export class BalanceService implements IBalanceService {
     let readableStream: TReadableStream<bigint>;
     switch (balanceType) {
       case BalanceType.inOrders:
-        readableStream = this.streamBuilder(() => Promise.resolve().then(() => 77));
+        readableStream = this.streamBuilder(() => Promise.resolve().then(() => BigInt(77)));
         break;
       case BalanceType.lockedInOrders:
-        readableStream = this.streamBuilder(() => Promise.resolve().then(() => 7));
+        readableStream = this.streamBuilder(() => Promise.resolve().then(() => BigInt(7)));
         break;
       default:
         readableStream = this.streamBuilder(() =>

@@ -9,9 +9,15 @@ export class WavesHttpNodeClient implements INodeClient {
   constructor(private readonly config: WavesHttpNodeClientCofig) {}
 
   getAddressBalance(address: string, assetId: string): Promise<bigint> {
-    return fetch(`${this.config.baseUrl}/assets/balance/${address}/${assetId}`)
-      .then((response) => response.json())
-      .then((data) => BigInt(data.balance));
+    if (assetId === 'WAVES') {
+      return fetch(`${this.config.baseUrl}/addresses/balance/${address}`)
+        .then((response) => response.json())
+        .then((data) => BigInt(data.balance));
+    } else {
+      return fetch(`${this.config.baseUrl}/assets/balance/${address}/${assetId}`)
+        .then((response) => response.json())
+        .then((data) => BigInt(data.balance));
+    }
   }
 
   getAssetDetails(assetId: string): Promise<AssetInfo> {

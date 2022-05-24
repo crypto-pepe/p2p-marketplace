@@ -8,7 +8,7 @@ import { BinancePriceOracle } from '$lib/oracles/prices/binance';
 const oracles: IPriceOracle[] = [new BinancePriceOracle()];
 let state: PricesMap = {};
 
-export const prices = readable<PricesMap>(state, (set) => {
+export const pricesStore = readable<PricesMap>(state, (set) => {
 	const updatePrices = async () => {
 		state = (
 			await Promise.allSettled(PRICE_ORACLE_ASSETS.map((asset) => fetchPrice(asset, oracles)))
