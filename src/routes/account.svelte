@@ -84,6 +84,22 @@
   );
   $: balances =
     $pricesStore && assetInfosMap && balancesFrom(balancesState, $pricesStore, assetInfosMap);
+
+  function getTotalBalance(balances: any) {
+    if (balances) {
+      let keys = Object.keys(balances).filter((balanceName) => {
+        return /USD$/.test(balanceName);
+      });
+      return keys.reduce((res, key) => {
+        if (balances[key]) {
+          return res + balances[key];
+        } else {
+          return res + 0;
+        }
+      }, 0);
+    }
+    return null;
+  }
 </script>
 
 <svelte:head>
@@ -102,7 +118,7 @@
     <br />
     Wallet type: {$walletStore.type}
     <br />
-    Total balance:
+    Total balance: $ {getTotalBalance(balances)}
     <br />
     <ul>
       {#if balances}
@@ -110,11 +126,11 @@
           <li>
             <span>{assetName}: </span>&nbsp&nbsp
             <span>{assetBalances.walletBalance}</span>&nbsp&nbsp
-            <span>${assetBalances.walletBalanceUSD}</span>&nbsp&nbsp
+            <span>$ {assetBalances.walletBalanceUSD}</span>&nbsp&nbsp
             <span>{assetBalances.inOrdersBalance}</span>&nbsp&nbsp
-            <span>${assetBalances.inOrdersBalanceUSD}</span>&nbsp&nbsp
+            <span>$ {assetBalances.inOrdersBalanceUSD}</span>&nbsp&nbsp
             <span>{assetBalances.lockInOrdersBalance}</span>&nbsp&nbsp
-            <span>${assetBalances.lockInOrdersBalanceUSD}</span>&nbsp&nbsp
+            <span>$ {assetBalances.lockInOrdersBalanceUSD}</span>&nbsp&nbsp
           </li>
         {/each}
       {/if}
