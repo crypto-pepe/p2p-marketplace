@@ -1,5 +1,5 @@
 import type { INodeClient } from '$lib/services/node-client';
-import type { AssetInfo } from 'src/lib/services/assets';
+import type { AssetInfo } from '$lib/services/assets';
 
 type WavesHttpNodeClientCofig = {
   baseUrl: string;
@@ -21,8 +21,12 @@ export class WavesHttpNodeClient implements INodeClient {
   }
 
   getAssetDetails(assetId: string): Promise<AssetInfo> {
-    return fetch(`${this.config.baseUrl}/assets/details/${assetId}`)
-      .then((response) => response.json())
-      .then((data) => ({ decimals: data.decimals, assetId: data.assetId, symbol: data.name }));
+    if (assetId === 'WAVES') {
+      return Promise.resolve().then(() => ({ decimals: 8, assetId: 'WAVES', symbol: 'WAVES' }));
+    } else {
+      return fetch(`${this.config.baseUrl}/assets/details/${assetId}`)
+        .then((response) => response.json())
+        .then((data) => ({ decimals: data.decimals, assetId: data.assetId, symbol: data.name }));
+    }
   }
 }

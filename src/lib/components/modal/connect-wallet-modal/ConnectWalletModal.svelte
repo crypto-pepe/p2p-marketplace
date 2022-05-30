@@ -26,10 +26,10 @@
   let modal: Modal;
   let connectionError: ConnectionError | undefined;
   let walletTypeInstall: WalletType = 'waveskeeper';
-	let prevConnetionState: boolean = $walletStore.isConnected;
+  let prevConnetionState: boolean = $walletStore.isConnected;
 
-	walletStore.subscribe(({ isConnected }) => {
-    if (prevConnetionState !== isConnected) {
+  walletStore.subscribe(({ isConnected }) => {
+    if (modal && prevConnetionState !== isConnected) {
       modal.closeModal();
     }
   });
@@ -60,9 +60,9 @@
   function disconnect() {
     step = Step.connect;
     disconnectWallet().finally(modal.closeModal);
-    if ($page.url.pathname === '/account' || $page.url.pathname === '/exchanges') {
-      goto('/');
-    }
+    // if ($page.url.pathname === '/account' || $page.url.pathname === '/exchanges') {
+    //   goto('/');
+    // }
   }
 </script>
 

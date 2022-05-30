@@ -18,8 +18,9 @@ export type AssetIds = {
 };
 
 export const WAVES_NODES_BASE_URL: string = 'https://nodes.wavesnodes.com';
-export const BALANCE_SERVICE_REFRESHING_INTERVAL_IN_MILLIS: number = 5 * 1_000;
+export const BALANCE_SERVICE_REFRESHING_INTERVAL_IN_MILLIS: number = 10 * 1_000;
 export const PRICE_ORACLE_INTERVAL_IN_MILLIS: number = 30 * 1_000;
+export const LOOP_TIMEOUT_IN_MILLIS: number = 1 * 1_000;
 export const PRICE_ORACLE_ASSETS: Asset[] = [
   CryptoAsset.BTC,
   CryptoAsset.ETH,

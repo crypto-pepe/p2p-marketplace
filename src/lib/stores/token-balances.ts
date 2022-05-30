@@ -1,15 +1,13 @@
 import type { ReadableStreamDefaultReader, ReadableStreamDefaultReadResult } from 'stream/web';
-import { CryptoAsset } from '../types';
 import type { INodeClient } from '$lib/services/node-client';
-import type { Readable } from 'svelte/store';
-import type { AssetIds, ChainId } from '../constants';
-import type { Blockchain, ChainInfo } from '../wallet/helper';
-import { derived } from 'svelte/store';
+import type { WalletType } from './wallet';
+import type { AssetIds, ChainId } from '$lib/constants';
+import { writable } from 'svelte/store';
+import { CryptoAsset } from '$lib/types';
 import { WavesHttpNodeClient } from '$lib/services/node-client/waves-http-node-client';
+import { ASSETS, WAVES_NODES_BASE_URL, LOOP_TIMEOUT_IN_MILLIS } from '$lib/constants';
 import { BalanceService, BalanceType } from '$lib/services/balance';
-import { ASSETS, WAVES_NODES_BASE_URL } from '../constants';
-import { walletStore } from './wallet';
-import { getAvailableChains } from '../wallet/helper';
+import { Blockchain, getAvailableChains } from '$lib/wallet/helper';
 
 export type BalancesStore = {
   [key in CryptoAsset]: AssetBalances;
@@ -34,8 +32,7 @@ export type BalancesReaders = {
 const wawesNodeClient: INodeClient = new WavesHttpNodeClient({
   baseUrl: WAVES_NODES_BASE_URL
 });
-
-let state: BalancesStore = Object.fromEntries(
+const initialState: BalancesStore = Object.fromEntries(
   Object.keys(CryptoAsset).map((assetName) => {
     const result = [
       assetName,
@@ -59,7 +56,10 @@ function isFulfuiled(
   }
 }
 
-function getBalancesReaders(assets: AssetIds, balanceService: BalanceService): BalancesReaders {
+export function getBalancesReaders(
+  assets: AssetIds,
+  balanceService: BalanceService
+): BalancesReaders {
   const result = Object.fromEntries(
     Object.entries(assets).map(([assetName, assetId]) => {
       return [
@@ -75,7 +75,7 @@ function getBalancesReaders(assets: AssetIds, balanceService: BalanceService): B
   return result as BalancesReaders;
 }
 
-function getBalancesStore(balancesReaders: BalancesReaders): Promise<BalancesStore> {
+export function getBalancesStore(balancesReaders: BalancesReaders): Promise<BalancesStore> {
   const assetIds = Object.keys(balancesReaders) as CryptoAsset[];
   const ps = Object.values(balancesReaders).map((balanceReader) => {
     return Promise.allSettled([
@@ -96,7 +96,7 @@ function getBalancesStore(balancesReaders: BalancesReaders): Promise<BalancesSto
     .then((balances) => Object.fromEntries(balances));
 }
 
-function unsubscribe(balancesReaders: BalancesReaders) {
+function unsubscribeSteamReaders(balancesReaders: BalancesReaders) {
   Object.values(balancesReaders).forEach((readers) => {
     Object.values(readers).forEach((stream: ReadableStreamDefaultReader<any>) => {
       stream.cancel();
@@ -104,45 +104,50 @@ function unsubscribe(balancesReaders: BalancesReaders) {
   });
 }
 
-export const balancesStore: Readable<BalancesStore> = derived(walletStore, ($walletStore, set) => {
+export function createBalancesStore(
+  address: string,
+  network: ChainId,
+  blockchain: Blockchain,
+  walletType: WalletType
+) {
+  let balancesState: BalancesStore;
   let balancesReaders: BalancesReaders;
-  set(state);
+  let timerId: NodeJS.Timer | undefined;
+  let isSubscribed: boolean = false;
 
-  if ($walletStore.isConnected) {
-    const address = $walletStore.address;
-    const network = $walletStore.chainId;
-    const balanceService = new BalanceService(wawesNodeClient, $walletStore.address);
-    const availableChains = getAvailableChains($walletStore.type);
-    const availableChain = availableChains.find((chain) => chain.chainId === $walletStore.chainId);
-    if (availableChain) {
-      const blockchain = availableChain.blockchain;
-      const chainId = availableChain.chainId as ChainId;
-      const assets = ASSETS[blockchain][chainId];
-      balancesReaders = getBalancesReaders(assets, balanceService);
-      const loop = async () => {
-        let timmerId: NodeJS.Timer;
-        state = await getBalancesStore(balancesReaders);
-        set(state);
-        timmerId = setTimeout(() => {
-          if (
-            !$walletStore.isConnected ||
-            $walletStore.address !== address ||
-            $walletStore.chainId !== network
-          ) {
-            clearTimeout(timmerId);
-            unsubscribe(balancesReaders);
-            return;
-          }
+  const { subscribe, set, update } = writable<BalancesStore>(initialState);
+  const balanceService = new BalanceService(wawesNodeClient, address);
+  const availableChains = getAvailableChains(walletType);
+  const availableChain = availableChains.find((chain) => chain.chainId === network);
+  if (availableChain) {
+    const assets = ASSETS[blockchain][network];
+    balancesReaders = getBalancesReaders(assets, balanceService);
+    isSubscribed = true;
+    const loop = async () => {
+      balancesState = await getBalancesStore(balancesReaders);
+      update((state) => (state = balancesState));
+      timerId = setTimeout(() => {
+        if (isSubscribed) {
           loop();
-        }, 1000);
-      };
-      loop();
-    }
+        }
+      }, LOOP_TIMEOUT_IN_MILLIS);
+    };
+    loop();
   }
 
-  return () => {
-    if (balancesReaders) {
-      unsubscribe(balancesReaders);
+  function unsubscribe() {
+    isSubscribed = false;
+    if (timerId) {
+      clearTimeout(timerId);
+      timerId = undefined;
     }
+
+    unsubscribeSteamReaders(balancesReaders);
+    set(initialState);
+  }
+
+  return {
+    subscribe,
+    unsubscribe
   };
-});
+}
