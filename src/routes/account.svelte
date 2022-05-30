@@ -7,7 +7,12 @@
   import { pricesStore } from '$lib/stores/prices';
   import { getAvailableChains } from '$lib/wallet/helper';
   import { onDestroy, onMount } from 'svelte';
-  import { balancesFrom } from '$lib/utils/balances';
+  import {
+    balancesFrom,
+    type Balances,
+    type BalancesForAssets,
+    type BalanceWithUSD
+  } from '$lib/utils/balances';
   import { AssetService } from '$lib/services/assets';
   import { WavesHttpNodeClient } from '$lib/services/node-client';
   import { ASSETS, WAVES_NODES_BASE_URL } from '$lib/constants';
@@ -84,19 +89,26 @@
   );
   $: balances =
     $pricesStore && assetInfosMap && balancesFrom(balancesState, $pricesStore, assetInfosMap);
+  $: totalBalance = getTotalBalance(balances);
 
-  function getTotalBalance(balances: any) {
+  function getTotalBalance(balances: BalancesForAssets) {
     if (balances) {
-      let keys = Object.keys(balances).filter((balanceName) => {
-        return /USD$/.test(balanceName);
-      });
-      return keys.reduce((res, key) => {
-        if (balances[key]) {
-          return res + balances[key];
-        } else {
-          return res + 0;
-        }
+      let result = Object.values(balances).reduce((acc: number, assetBalances: Balances) => {
+        console.log('assetBalances:', assetBalances);
+        let balance = Object.values(assetBalances).reduce(
+          (acc: number, walletType: BalanceWithUSD) => {
+            if (walletType.amountUSD) {
+              return acc + Number(walletType.amountUSD);
+            }
+            return acc;
+          },
+          0
+        );
+        console.log('balance: ', balance);
+        return acc + balance;
       }, 0);
+
+      return result.toFixed(2);
     }
     return null;
   }
@@ -125,12 +137,10 @@
         {#each Object.entries(balances) as [assetName, assetBalances]}
           <li>
             <span>{assetName}: </span>&nbsp&nbsp
-            <span>{assetBalances.walletBalance}</span>&nbsp&nbsp
-            <span>$ {assetBalances.walletBalanceUSD}</span>&nbsp&nbsp
-            <span>{assetBalances.inOrdersBalance}</span>&nbsp&nbsp
-            <span>$ {assetBalances.inOrdersBalanceUSD}</span>&nbsp&nbsp
-            <span>{assetBalances.lockInOrdersBalance}</span>&nbsp&nbsp
-            <span>$ {assetBalances.lockInOrdersBalanceUSD}</span>&nbsp&nbsp
+            {#each Object.values(assetBalances) as balanceAmounts}
+              <span>{balanceAmounts.amount}</span>&nbsp&nbsp
+              <span>$ {balanceAmounts.amountUSD}</span>&nbsp&nbsp
+            {/each}
           </li>
         {/each}
       {/if}

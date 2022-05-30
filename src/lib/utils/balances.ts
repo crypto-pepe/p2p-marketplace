@@ -1,64 +1,72 @@
 import type { CryptoAsset, PricesMap } from '../types';
-import type { BalancesStore } from 'src/lib/stores/token-balances';
+import type { AssetBalances, BalancesStore } from 'src/lib/stores/token-balances';
 import type { AssetInfo } from '../wallet';
 import { bigIntToFloatString } from './strings';
 
-type AllBalances = {
-  [key in CryptoAsset]: {
-    walletBalance: string | null;
-    walletBalanceUSD: string | null;
-    inOrdersBalance: string | null;
-    inOrdersBalanceUSD: string | null;
-    lockInOrdersBalance: string | null;
-    lockInOrdersBalanceUSD: string | null;
-  };
+export type BalancesForAssets = {
+  [key in CryptoAsset]: Balances;
 };
 
-function calculateUsdBalance(
-  assetBalance: bigint | null,
-  price: number,
-  decimals: number
-): string | null {
-  if (assetBalance) {
-    const satoshiBalance = BigInt(Number(assetBalance) * price);
-    bigIntToFloatString(satoshiBalance, decimals);
-  }
-  return null;
+export type Balances = {
+  [key in BalancesType]: BalanceWithUSD;
+};
+
+enum BalancesType {
+  walletBalance = 'walletBalance',
+  inOrdersBalance = 'inOrdersBalance',
+  lockInOrdersBalance = 'lockInOrdersBalance'
 }
 
-function trasformBalanceValue(
-  assetBalance: bigint | null | undefined,
+export type BalanceWithUSD = {
+  amount: string | null;
+  amountUSD: string | null;
+};
+
+function calculateUsdPrice(balance: bigint, decimals: number, price: number): string {
+  const result = (price * 100 * Number(balance)) / 10 ** decimals;
+  return Math.floor(result / 100) > 0 ? result.toFixed(2) : '0';
+}
+
+function getBalancesForAsset(
+  assetBalances: AssetBalances,
   decimals: number | null,
-  price: number | null = null,
-  fiat: 'USD' | null = null
-) {
-  if (assetBalance === undefined || assetBalance === null || decimals === null) {
-    return null;
-  }
-  if (fiat) {
-    if (price === null) {
-      return null;
-    }
-    if (Number(assetBalance) === 0) {
-      return '0';
-    } else {
-      const result = (price * 100 * Number(assetBalance)) / 10 ** decimals;
-      return Math.floor(result / 100) > 0 ? result.toFixed(2) : '0';
-    }
-  } else {
-    if (Number(assetBalance) === 0) {
-      return '0';
-    } else {
-      return bigIntToFloatString(assetBalance, decimals);
-    }
-  }
+  price: number | null = null
+): Balances {
+  return Object.fromEntries(
+    Object.entries(assetBalances).map(([balanceName, balance]) => {
+      if (balance === undefined || balance === null || decimals === null) {
+        return [balanceName, { amount: null, amountUSD: null }];
+      } else if (price === null) {
+        if (Number(balance) === 0) {
+          return [balanceName, { amount: '0', amountUSD: null }];
+        } else {
+          return [balanceName, { amount: bigIntToFloatString(balance, decimals), amountUSD: null }];
+        }
+      } else {
+        if (Number(balance) === 0) {
+          return [
+            balanceName,
+            { amount: '0', amountUSD: calculateUsdPrice(balance, decimals, price) }
+          ];
+        } else {
+          return [
+            balanceName,
+            {
+              amount: bigIntToFloatString(balance, decimals),
+              amountUSD: calculateUsdPrice(balance, decimals, price)
+            }
+          ];
+        }
+      }
+    })
+  );
 }
 
 export function balancesFrom(
   balances: BalancesStore,
   prices: PricesMap,
   assetInfoMap: { [key in CryptoAsset]: AssetInfo }
-): AllBalances {
+): BalancesForAssets {
   const result = Object.fromEntries(
     Object.entries(balances).map(([assetName, assetBalances]) => {
       let price = null;
@@ -74,34 +82,9 @@ export function balancesFrom(
         decimals = assetInfoMap[assetName as CryptoAsset].decimals;
       }
 
-      return [
-        assetName,
-        {
-          walletBalance: trasformBalanceValue(assetBalances.walletBalance, decimals),
-          walletBalanceUSD: trasformBalanceValue(
-            assetBalances.walletBalance,
-            decimals,
-            price,
-            'USD'
-          ),
-          inOrdersBalance: trasformBalanceValue(assetBalances.inOrdersBalance, decimals),
-          inOrdersBalanceUSD: trasformBalanceValue(
-            assetBalances.inOrdersBalance,
-            decimals,
-            price,
-            'USD'
-          ),
-          lockInOrdersBalance: trasformBalanceValue(assetBalances.lockInOrdersBalance, decimals),
-          lockInOrdersBalanceUSD: trasformBalanceValue(
-            assetBalances.lockInOrdersBalance,
-            decimals,
-            price,
-            'USD'
-          )
-        }
-      ];
+      return [assetName, getBalancesForAsset(assetBalances, decimals, price)];
     })
   );
 
-  return result as AllBalances;
+  return result as BalancesForAssets;
 }
