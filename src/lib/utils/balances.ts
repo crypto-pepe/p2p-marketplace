@@ -23,8 +23,8 @@ export type BalanceWithUSD = {
 };
 
 function calculateUsdPrice(balance: bigint, decimals: number, price: number): string {
-  const result = (price * 100 * Number(balance)) / 10 ** decimals;
-  return Math.floor(result / 100) > 0 ? result.toFixed(2) : '0';
+  const result = (price * 100 * Number(balance)) / 10 ** decimals / 100;
+  return Math.floor(result) > 0 ? result.toFixed(2) : '0';
 }
 
 function getBalancesForAsset(

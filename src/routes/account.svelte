@@ -89,12 +89,10 @@
   );
   $: balances =
     $pricesStore && assetInfosMap && balancesFrom(balancesState, $pricesStore, assetInfosMap);
-  $: totalBalance = getTotalBalance(balances);
 
   function getTotalBalance(balances: BalancesForAssets) {
     if (balances) {
       let result = Object.values(balances).reduce((acc: number, assetBalances: Balances) => {
-        console.log('assetBalances:', assetBalances);
         let balance = Object.values(assetBalances).reduce(
           (acc: number, walletType: BalanceWithUSD) => {
             if (walletType.amountUSD) {
@@ -104,7 +102,6 @@
           },
           0
         );
-        console.log('balance: ', balance);
         return acc + balance;
       }, 0);
 
