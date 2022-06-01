@@ -29,9 +29,7 @@ export type BalancesReaders = {
   [key in CryptoAsset]: BalanceReaders;
 };
 
-const wawesNodeClient: INodeClient = new WavesHttpNodeClient({
-  baseUrl: WAVES_NODES_BASE_URL
-});
+
 const initialState: BalancesStore = Object.fromEntries(
   Object.keys(CryptoAsset).map((assetName) => {
     const result = [
@@ -108,7 +106,8 @@ export function createBalancesStore(
   address: string,
   network: ChainId,
   blockchain: Blockchain,
-  walletType: WalletType
+  walletType: WalletType,
+  nodeClient: INodeClient
 ) {
   let balancesState: BalancesStore;
   let balancesReaders: BalancesReaders;
@@ -116,7 +115,7 @@ export function createBalancesStore(
   let isSubscribed: boolean = false;
 
   const { subscribe, set, update } = writable<BalancesStore>(initialState);
-  const balanceService = new BalanceService(wawesNodeClient, address);
+  const balanceService = new BalanceService(nodeClient, address);
   const availableChains = getAvailableChains(walletType);
   const availableChain = availableChains.find((chain) => chain.chainId === network);
   if (availableChain) {

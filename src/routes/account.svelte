@@ -47,7 +47,8 @@
           walletState.address,
           walletState.chainId,
           walletState.blockchain,
-          walletState.type
+          walletState.type,
+          wawesNodeClient
         );
 
         balanceUnsubscriber = balancesStore.unsubscribe;
