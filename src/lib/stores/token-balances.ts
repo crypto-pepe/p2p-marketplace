@@ -73,7 +73,7 @@ export function getBalancesReaders(
   return result as BalancesReaders;
 }
 
-export function getBalancesStore(balancesReaders: BalancesReaders): Promise<BalancesStore> {
+export function getBalancesState(balancesReaders: BalancesReaders): Promise<BalancesStore> {
   const assetIds = Object.keys(balancesReaders) as CryptoAsset[];
   const ps = Object.values(balancesReaders).map((balanceReader) => {
     return Promise.allSettled([
@@ -123,7 +123,7 @@ export function createBalancesStore(
     balancesReaders = getBalancesReaders(assets, balanceService);
     isSubscribed = true;
     const loop = async () => {
-      balancesState = await getBalancesStore(balancesReaders);
+      balancesState = await getBalancesState(balancesReaders);
       update((state) => (state = balancesState));
       timerId = setTimeout(() => {
         if (isSubscribed) {
