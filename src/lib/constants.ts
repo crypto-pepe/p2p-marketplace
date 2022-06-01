@@ -2,15 +2,13 @@ import type { Asset } from './types';
 import { CryptoAsset, FiatAsset } from './types';
 import type { BlockchainId } from './wallet/helper';
 
-type Blockchains = {
+export type Blockchains = {
   [key in BlockchainId]: Blockchain;
 };
 
 type Blockchain = {
   name: string;
-  chains: {
-    [key: string]: Chain;
-  };
+  chains: { [key: string]: Chain };
 };
 
 type Chain = {

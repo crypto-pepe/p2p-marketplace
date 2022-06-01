@@ -60,9 +60,6 @@
   function disconnect() {
     step = Step.connect;
     disconnectWallet().finally(modal.closeModal);
-    // if ($page.url.pathname === '/account' || $page.url.pathname === '/exchanges') {
-    //   goto('/');
-    // }
   }
 </script>
 

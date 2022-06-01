@@ -30,55 +30,35 @@ export type ConnectionError = {
 const DefaultWalletState: WalletState = { isConnected: false };
 const { subscribe, update } = writable<WalletState>({ ...DefaultWalletState });
 
+async function updateWalletState(wallet: IWallet<unknown>) {
+  try {
+    const address = await wallet.getAddress();
+    const chainId = (await wallet.getChainId()) as ChainId<BlockchainId>;
+    const type = wallet.getType();
+    const availableChain = getAvailableChains(type).find((chain) => chain.chainId === chainId);
+    const blockchain = availableChain?.blockchain as BlockchainId;
+    localStorage.setItem('connectedWallet', JSON.stringify({ address, type, blockchain, chainId }));
+    update(() => ({
+      isConnected: true,
+      address,
+      blockchain,
+      chainId,
+      type
+    }));
+  } catch {
+    update(() => ({
+      isConnected: false
+    }));
+  }
+}
+
 export async function connectWallet(wallet: IWallet<unknown>) {
   wallet.onConnect(async () => {
-    try {
-      const address = await wallet.getAddress();
-      const chainId = (await wallet.getChainId()) as ChainId<BlockchainId>;
-      const type = wallet.getType();
-      const availableChain = getAvailableChains(type).find((chain) => chain.chainId === chainId);
-      const blockchain = availableChain?.blockchain as BlockchainId;
-      localStorage.setItem(
-        'connectedWallet',
-        JSON.stringify({ address, type, blockchain, chainId })
-      );
-      update(() => ({
-        isConnected: true,
-        address,
-        blockchain,
-        chainId,
-        type
-      }));
-    } catch {
-      update(() => ({
-        isConnected: false
-      }));
-    }
+    await updateWalletState(wallet);
   });
 
   wallet.onChange(async () => {
-    try {
-      const address = await wallet.getAddress();
-      const chainId = (await wallet.getChainId()) as ChainId<BlockchainId>;
-      const type = wallet.getType();
-      const availableChain = getAvailableChains(type).find((chain) => chain.chainId === chainId);
-      const blockchain = availableChain?.blockchain as BlockchainId;
-      localStorage.setItem(
-        'connectedWallet',
-        JSON.stringify({ address, type, blockchain, chainId })
-      );
-      update(() => ({
-        isConnected: true,
-        address,
-        blockchain,
-        chainId,
-        type
-      }));
-    } catch {
-      update(() => ({
-        isConnected: false
-      }));
-    }
+    await updateWalletState(wallet);
   });
 
   wallet.onDisconnect(() => {
@@ -86,29 +66,7 @@ export async function connectWallet(wallet: IWallet<unknown>) {
     update(() => DefaultWalletState);
   });
 
-  const address = await wallet.getAddress();
-  const chainId = (await wallet.getChainId()) as ChainId<BlockchainId>;
-  const type = wallet.getType();
-  const availableChain = getAvailableChains(type).find((chain) => chain.chainId === chainId);
-  const blockchain = availableChain?.blockchain as BlockchainId;
-  localStorage.setItem(
-    'connectedWallet',
-    JSON.stringify({
-      isConnected: true,
-      address,
-      blockchain,
-      chainId,
-      type
-    })
-  );
-
-  update(() => ({
-    isConnected: true,
-    address,
-    blockchain,
-    chainId,
-    type
-  }));
+  await updateWalletState(wallet);
 }
 
 export async function disconnectWallet() {
@@ -137,10 +95,11 @@ const loadFromLocalStorage = async () => {
           return null;
         }
       } else {
-        throw new Error();
+        throw new Error('Can not connect to wallet from storage');
       }
-    } catch (e) {
+    } catch (e: any) {
       localStorage.removeItem('connectedWallet');
+      console.log(e.message);
       return null;
     }
   } else {

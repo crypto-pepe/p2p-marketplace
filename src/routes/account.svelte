@@ -1,22 +1,19 @@
 <script lang="ts" context="module">
   import type { AssetInfo } from '$lib/wallet';
   import type { CryptoAsset } from '$lib/types';
+  import type { Unsubscriber } from 'svelte/store';
+  import type { WalletState } from '$lib/stores/wallet';
+  import type { BalancesStore } from '$lib/stores/token-balances';
+  import { onDestroy, onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { walletStore, type WalletState } from '$lib/stores/wallet';
-  import { createBalancesStore, type BalancesStore } from '$lib/stores/token-balances';
+  import { walletStore } from '$lib/stores/wallet';
+  import { createBalancesStore } from '$lib/stores/token-balances';
   import { pricesStore } from '$lib/stores/prices';
   import { getAvailableChains } from '$lib/wallet/helper';
-  import { onDestroy, onMount } from 'svelte';
-  import {
-    balancesFrom,
-    type Balances,
-    type BalancesForAssets,
-    type BalanceWithUSD
-  } from '$lib/utils/balances';
+  import { balancesFrom, calculateTotalBalance } from '$lib/utils/balances';
   import { AssetService } from '$lib/services/assets';
-  import { WavesHttpNodeClient } from '$lib/services/node-client';
-  import { BLOCKCHAINS, WAVES_NODES_BASE_URL } from '$lib/constants';
-  import type { Unsubscriber } from 'svelte/store';
+  import { BLOCKCHAINS } from '$lib/constants';
+  import { initNodeClient } from '$lib/services/node-client/factory';
 
   type AssetInfosMap = {
     [key in CryptoAsset]: AssetInfo;
@@ -24,8 +21,6 @@
 </script>
 
 <script lang="ts">
-  const wawesNodeClient = new WavesHttpNodeClient({ baseUrl: WAVES_NODES_BASE_URL });
-  const assetsService = new AssetService(wawesNodeClient);
   let assetInfosMap: AssetInfosMap;
   let balancesState: BalancesStore;
   let balancesStore;
@@ -37,8 +32,12 @@
     await walletStore.loadFromLocalStorage();
     walletUnsubscriber = walletStore.subscribe(async (state) => {
       walletState = state;
-
+      console.log('wallet state: ', state);
       if (walletState.isConnected) {
+        console.log('wallet connected');
+        let nodeClient = initNodeClient(walletState.blockchain, walletState.chainId as string);
+        let assetsService = new AssetService(nodeClient);
+
         if (balanceUnsubscriber !== undefined) {
           balanceUnsubscriber();
         }
@@ -48,7 +47,7 @@
           walletState.chainId,
           walletState.blockchain,
           walletState.type,
-          wawesNodeClient
+          nodeClient
         );
 
         balanceUnsubscriber = balancesStore.unsubscribe;
@@ -91,25 +90,7 @@
   $: balances =
     $pricesStore && assetInfosMap && balancesFrom(balancesState, $pricesStore, assetInfosMap);
 
-  function getTotalBalance(balances: BalancesForAssets) {
-    if (balances) {
-      let result = Object.values(balances).reduce((acc: number, assetBalances: Balances) => {
-        let balance = Object.values(assetBalances).reduce(
-          (acc: number, walletType: BalanceWithUSD) => {
-            if (walletType.amountUSD) {
-              return acc + Number(walletType.amountUSD);
-            }
-            return acc;
-          },
-          0
-        );
-        return acc + balance;
-      }, 0);
-
-      return result.toFixed(2);
-    }
-    return null;
-  }
+  
 </script>
 
 <svelte:head>
@@ -128,7 +109,7 @@
     <br />
     Wallet type: {$walletStore.type}
     <br />
-    Total balance: $ {getTotalBalance(balances)}
+    Total balance: $ {calculateTotalBalance(balances)}
     <br />
     <ul>
       {#if balances}

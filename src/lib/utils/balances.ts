@@ -1,6 +1,7 @@
-import type { CryptoAsset, PricesMap } from '../types';
+import type { PricesMap } from '../types';
 import type { AssetBalances, BalancesStore } from 'src/lib/stores/token-balances';
 import type { AssetInfo } from '../wallet';
+import { CryptoAsset } from '../types';
 import { bigIntToFloatString } from './strings';
 
 export type BalancesForAssets = {
@@ -18,13 +19,18 @@ enum BalancesType {
 }
 
 export type BalanceWithUSD = {
-  amount: string | null;
-  amountUSD: string | null;
+  amount: number | null;
+  amountUSD: number | null;
 };
 
-function calculateUsdPrice(balance: bigint, decimals: number, price: number): string {
+export const _private = {
+  calculateUsdPrice,
+  getBalancesForAsset
+};
+
+function calculateUsdPrice(balance: bigint, decimals: number, price: number): number {
   const result = (price * 100 * Number(balance)) / 10 ** decimals / 100;
-  return Math.floor(result) > 0 ? result.toFixed(2) : '0';
+  return Math.floor(result) > 0 ? Math.floor(result * 100) / 100 : 0;
 }
 
 function getBalancesForAsset(
@@ -38,7 +44,7 @@ function getBalancesForAsset(
         return [balanceName, { amount: null, amountUSD: null }];
       } else if (price === null) {
         if (Number(balance) === 0) {
-          return [balanceName, { amount: '0', amountUSD: null }];
+          return [balanceName, { amount: 0, amountUSD: null }];
         } else {
           return [balanceName, { amount: bigIntToFloatString(balance, decimals), amountUSD: null }];
         }
@@ -46,7 +52,7 @@ function getBalancesForAsset(
         if (Number(balance) === 0) {
           return [
             balanceName,
-            { amount: '0', amountUSD: calculateUsdPrice(balance, decimals, price) }
+            { amount: 0, amountUSD: calculateUsdPrice(balance, decimals, price) }
           ];
         } else {
           return [
@@ -72,7 +78,7 @@ export function balancesFrom(
       let price = null;
       let decimals = null;
 
-      if (assetName === 'USDT') {
+      if (assetName === CryptoAsset.USDT) {
         price = 1;
       } else if (prices[assetName as CryptoAsset]) {
         price = prices[assetName as CryptoAsset] ? prices[assetName as CryptoAsset]?.price : null;
@@ -87,4 +93,24 @@ export function balancesFrom(
   );
 
   return result as BalancesForAssets;
+}
+
+export function calculateTotalBalance(balances: BalancesForAssets): number {
+  if (balances) {
+    let result = Object.values(balances).reduce((acc: number, assetBalances: Balances) => {
+      let balance = Object.values(assetBalances).reduce(
+        (acc: number, walletType: BalanceWithUSD) => {
+          if (walletType.amountUSD) {
+            return acc + Number(walletType.amountUSD);
+          }
+          return acc;
+        },
+        0
+      );
+      return acc + balance;
+    }, 0);
+
+    return result;
+  }
+  return 0;
 }
