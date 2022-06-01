@@ -44,7 +44,7 @@ const initialState: BalancesStore = Object.fromEntries(
   })
 );
 
-function isFulfuiled(
+function getBalanceValue(
   data: PromiseSettledResult<ReadableStreamDefaultReadResult<bigint>>
 ): bigint | null {
   if (data.status === 'fulfilled') {
@@ -81,9 +81,9 @@ export function getBalancesStore(balancesReaders: BalancesReaders): Promise<Bala
       balanceReader.inOrdersReader.read(),
       balanceReader.lockInOrdersReader.read()
     ]).then((result) => ({
-      walletBalance: isFulfuiled(result[0]),
-      inOrdersBalance: isFulfuiled(result[1]),
-      lockInOrdersBalance: isFulfuiled(result[2])
+      walletBalance: getBalanceValue(result[0]),
+      inOrdersBalance: getBalanceValue(result[1]),
+      lockInOrdersBalance: getBalanceValue(result[2])
     }));
   });
 
