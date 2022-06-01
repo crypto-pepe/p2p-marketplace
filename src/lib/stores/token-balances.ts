@@ -4,10 +4,9 @@ import type { WalletType } from './wallet';
 import type { AssetIds, ChainId } from '$lib/constants';
 import { writable } from 'svelte/store';
 import { CryptoAsset } from '$lib/types';
-import { WavesHttpNodeClient } from '$lib/services/node-client/waves-http-node-client';
-import { ASSETS, WAVES_NODES_BASE_URL, LOOP_TIMEOUT_IN_MILLIS } from '$lib/constants';
+import { BLOCKCHAINS, LOOP_TIMEOUT_IN_MILLIS } from '$lib/constants';
 import { BalanceService, BalanceType } from '$lib/services/balance';
-import { Blockchain, getAvailableChains } from '$lib/wallet/helper';
+import { BlockchainId, getAvailableChains } from '$lib/wallet/helper';
 
 export type BalancesStore = {
   [key in CryptoAsset]: AssetBalances;
@@ -29,7 +28,6 @@ export type BalancesReaders = {
   [key in CryptoAsset]: BalanceReaders;
 };
 
-
 const initialState: BalancesStore = Object.fromEntries(
   Object.keys(CryptoAsset).map((assetName) => {
     const result = [
@@ -44,7 +42,7 @@ const initialState: BalancesStore = Object.fromEntries(
   })
 );
 
-function getBalanceValue(
+function getNullableBalance(
   data: PromiseSettledResult<ReadableStreamDefaultReadResult<bigint>>
 ): bigint | null {
   if (data.status === 'fulfilled') {
@@ -81,9 +79,9 @@ export function getBalancesState(balancesReaders: BalancesReaders): Promise<Bala
       balanceReader.inOrdersReader.read(),
       balanceReader.lockInOrdersReader.read()
     ]).then((result) => ({
-      walletBalance: getBalanceValue(result[0]),
-      inOrdersBalance: getBalanceValue(result[1]),
-      lockInOrdersBalance: getBalanceValue(result[2])
+      walletBalance: getNullableBalance(result[0]),
+      inOrdersBalance: getNullableBalance(result[1]),
+      lockInOrdersBalance: getNullableBalance(result[2])
     }));
   });
 
@@ -104,8 +102,8 @@ function unsubscribeSteamReaders(balancesReaders: BalancesReaders) {
 
 export function createBalancesStore(
   address: string,
-  network: ChainId,
-  blockchain: Blockchain,
+  network: ChainId<BlockchainId>,
+  blockchain: BlockchainId,
   walletType: WalletType,
   nodeClient: INodeClient
 ) {
@@ -119,7 +117,7 @@ export function createBalancesStore(
   const availableChains = getAvailableChains(walletType);
   const availableChain = availableChains.find((chain) => chain.chainId === network);
   if (availableChain) {
-    const assets = ASSETS[blockchain][network];
+    const assets = BLOCKCHAINS[blockchain].chains[network].assets;
     balancesReaders = getBalancesReaders(assets, balanceService);
     isSubscribed = true;
     const loop = async () => {

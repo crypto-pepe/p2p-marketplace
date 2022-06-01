@@ -15,7 +15,7 @@
   } from '$lib/utils/balances';
   import { AssetService } from '$lib/services/assets';
   import { WavesHttpNodeClient } from '$lib/services/node-client';
-  import { ASSETS, WAVES_NODES_BASE_URL } from '$lib/constants';
+  import { BLOCKCHAINS, WAVES_NODES_BASE_URL } from '$lib/constants';
   import type { Unsubscriber } from 'svelte/store';
 
   type AssetInfosMap = {
@@ -58,7 +58,7 @@
         const blockchain = walletState.blockchain;
         const chainId = walletState.chainId;
         const assetSymbols = Object.keys(balancesState) as CryptoAsset[];
-        const assetIds = ASSETS[blockchain][chainId];
+        const assetIds = BLOCKCHAINS[blockchain].chains[chainId].assets;
         const ps = assetSymbols.map((symbol) => {
           return assetsService.getAssetInfo(assetIds[symbol]);
         });

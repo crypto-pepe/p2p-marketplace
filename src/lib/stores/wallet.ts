@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import type { ChainId } from '../constants';
 import type IWallet from '../wallet';
-import { Blockchain, getAvailableChains, getWalletByType } from '../wallet/helper';
+import { BlockchainId, getAvailableChains, getWalletByType } from '../wallet/helper';
 
 export type WalletType = 'waveskeeper';
 
@@ -11,8 +11,8 @@ type DisconnectedWalletState = {
 
 export type WalletInfoState = {
   address: string;
-  chainId: ChainId;
-  blockchain: Blockchain;
+  chainId: ChainId<BlockchainId>;
+  blockchain: BlockchainId;
   type: WalletType;
 };
 
@@ -34,10 +34,10 @@ export async function connectWallet(wallet: IWallet<unknown>) {
   wallet.onConnect(async () => {
     try {
       const address = await wallet.getAddress();
-      const chainId = (await wallet.getChainId()) as ChainId;
+      const chainId = (await wallet.getChainId()) as ChainId<BlockchainId>;
       const type = wallet.getType();
       const availableChain = getAvailableChains(type).find((chain) => chain.chainId === chainId);
-      const blockchain = availableChain?.blockchain as Blockchain;
+      const blockchain = availableChain?.blockchain as BlockchainId;
       localStorage.setItem(
         'connectedWallet',
         JSON.stringify({ address, type, blockchain, chainId })
@@ -59,10 +59,10 @@ export async function connectWallet(wallet: IWallet<unknown>) {
   wallet.onChange(async () => {
     try {
       const address = await wallet.getAddress();
-      const chainId = (await wallet.getChainId()) as ChainId;
+      const chainId = (await wallet.getChainId()) as ChainId<BlockchainId>;
       const type = wallet.getType();
       const availableChain = getAvailableChains(type).find((chain) => chain.chainId === chainId);
-      const blockchain = availableChain?.blockchain as Blockchain;
+      const blockchain = availableChain?.blockchain as BlockchainId;
       localStorage.setItem(
         'connectedWallet',
         JSON.stringify({ address, type, blockchain, chainId })
@@ -87,10 +87,10 @@ export async function connectWallet(wallet: IWallet<unknown>) {
   });
 
   const address = await wallet.getAddress();
-  const chainId = (await wallet.getChainId()) as ChainId;
+  const chainId = (await wallet.getChainId()) as ChainId<BlockchainId>;
   const type = wallet.getType();
   const availableChain = getAvailableChains(type).find((chain) => chain.chainId === chainId);
-  const blockchain = availableChain?.blockchain as Blockchain;
+  const blockchain = availableChain?.blockchain as BlockchainId;
   localStorage.setItem(
     'connectedWallet',
     JSON.stringify({

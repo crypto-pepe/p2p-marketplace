@@ -1,17 +1,31 @@
 import type { Asset } from './types';
 import { CryptoAsset, FiatAsset } from './types';
-import type { Blockchain } from './wallet/helper';
+import type { BlockchainId } from './wallet/helper';
 
-export enum ChainId {
-  T = 'T',
-  W = 'W'
-}
+type Blockchains = {
+  [key in BlockchainId]: Blockchain;
+};
 
-export type Assets = {
-  [key in Blockchain]: {
-    [key in ChainId]: AssetIds;
+type Blockchain = {
+  name: string;
+  chains: {
+    [key: string]: Chain;
   };
 };
+
+type Chain = {
+  chainName: string;
+  assets: AssetIds;
+  baseUrl: string;
+};
+
+export type ChainId<BlockchainId extends keyof Blockchains> =
+  keyof Blockchains[BlockchainId]['chains'];
+
+export type Assets<
+  BlockchainId extends keyof Blockchains,
+  ChainId extends keyof Blockchains[BlockchainId]['chains']
+> = Blockchains[BlockchainId]['chains'][ChainId]['assets'];
 
 export type AssetIds = {
   [key in CryptoAsset]: string;
@@ -28,19 +42,31 @@ export const PRICE_ORACLE_ASSETS: Asset[] = [
   FiatAsset.EUR,
   FiatAsset.RUB
 ];
-export const ASSETS: Assets = {
+
+export const BLOCKCHAINS: Blockchains = {
   waves: {
-    T: {
-      WAVES: 'c',
-      USDT: 'a',
-      BTC: 'b',
-      ETH: 'd'
-    },
-    W: {
-      WAVES: 'WAVES',
-      USDT: '34N9YcEETLWn93qYQ64EsP1x89tSruJU44RrEMSXXEPJ',
-      BTC: '8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
-      ETH: '474jTeYx2r2Va35794tCScAXWJG9hU2HcgxzMowaZUnu'
+    name: 'Waves',
+    chains: {
+      T: {
+        chainName: 'Waves testnet',
+        assets: {
+          WAVES: 'c',
+          USDT: 'a',
+          BTC: 'b',
+          ETH: 'd'
+        },
+        baseUrl: ''
+      },
+      W: {
+        chainName: 'Waves mainnet',
+        assets: {
+          WAVES: 'WAVES',
+          USDT: '34N9YcEETLWn93qYQ64EsP1x89tSruJU44RrEMSXXEPJ',
+          BTC: '8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
+          ETH: '474jTeYx2r2Va35794tCScAXWJG9hU2HcgxzMowaZUnu'
+        },
+        baseUrl: WAVES_NODES_BASE_URL
+      }
     }
   }
 };
