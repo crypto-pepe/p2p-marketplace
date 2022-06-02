@@ -102,8 +102,6 @@ const loadFromLocalStorage = async () => {
       console.log(e.message);
       return null;
     }
-  } else {
-    console.log('initial state is null');
   }
 };
 

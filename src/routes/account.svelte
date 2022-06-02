@@ -14,6 +14,7 @@
   import { AssetService } from '$lib/services/assets';
   import { BLOCKCHAINS } from '$lib/constants';
   import { initNodeClient } from '$lib/services/node-client/factory';
+  import { bigIntToFloatString, calculateFloatSimbols } from '$lib/utils/strings';
 
   type AssetInfosMap = {
     [key in CryptoAsset]: AssetInfo;
@@ -32,9 +33,7 @@
     await walletStore.loadFromLocalStorage();
     walletUnsubscriber = walletStore.subscribe(async (state) => {
       walletState = state;
-      console.log('wallet state: ', state);
       if (walletState.isConnected) {
-        console.log('wallet connected');
         let nodeClient = initNodeClient(walletState.blockchain, walletState.chainId as string);
         let assetsService = new AssetService(nodeClient);
 
@@ -89,8 +88,6 @@
   );
   $: balances =
     $pricesStore && assetInfosMap && balancesFrom(balancesState, $pricesStore, assetInfosMap);
-
-  
 </script>
 
 <svelte:head>
@@ -109,7 +106,7 @@
     <br />
     Wallet type: {$walletStore.type}
     <br />
-    Total balance: $ {calculateTotalBalance(balances)}
+    Total balance: $ {calculateTotalBalance(balances).toFixed(2)}
     <br />
     <ul>
       {#if balances}
@@ -117,7 +114,15 @@
           <li>
             <span>{assetName}: </span>&nbsp&nbsp
             {#each Object.values(assetBalances) as balanceAmounts}
-              <span>{balanceAmounts.amount}</span>&nbsp&nbsp
+              <span
+                >{balanceAmounts.amount !== null
+                  ? bigIntToFloatString(
+                      balanceAmounts.amount,
+                      assetInfosMap[assetName].decimals,
+                      calculateFloatSimbols(assetName)
+                    )
+                  : balanceAmounts.amount}</span
+              >&nbsp&nbsp
               <span>$ {balanceAmounts.amountUSD}</span>&nbsp&nbsp
             {/each}
           </li>

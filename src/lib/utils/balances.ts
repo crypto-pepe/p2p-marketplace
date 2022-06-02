@@ -2,7 +2,6 @@ import type { PricesMap } from '../types';
 import type { AssetBalances, BalancesStore } from 'src/lib/stores/token-balances';
 import type { AssetInfo } from '../wallet';
 import { CryptoAsset } from '../types';
-import { bigIntToFloatString } from './strings';
 
 export type BalancesForAssets = {
   [key in CryptoAsset]: Balances;
@@ -19,7 +18,7 @@ enum BalancesType {
 }
 
 export type BalanceWithUSD = {
-  amount: number | null;
+  amount: bigint | null;
   amountUSD: number | null;
 };
 
@@ -46,19 +45,19 @@ function getBalancesForAsset(
         if (Number(balance) === 0) {
           return [balanceName, { amount: 0, amountUSD: null }];
         } else {
-          return [balanceName, { amount: bigIntToFloatString(balance, decimals), amountUSD: null }];
+          return [balanceName, { amount: balance, amountUSD: null }];
         }
       } else {
         if (Number(balance) === 0) {
           return [
             balanceName,
-            { amount: 0, amountUSD: calculateUsdPrice(balance, decimals, price) }
+            { amount: 0n, amountUSD: calculateUsdPrice(balance, decimals, price) }
           ];
         } else {
           return [
             balanceName,
             {
-              amount: bigIntToFloatString(balance, decimals),
+              amount: balance,
               amountUSD: calculateUsdPrice(balance, decimals, price)
             }
           ];
@@ -101,7 +100,7 @@ export function calculateTotalBalance(balances: BalancesForAssets): number {
       let balance = Object.values(assetBalances).reduce(
         (acc: number, walletType: BalanceWithUSD) => {
           if (walletType.amountUSD) {
-            return acc + Number(walletType.amountUSD);
+            return acc + walletType.amountUSD;
           }
           return acc;
         },
