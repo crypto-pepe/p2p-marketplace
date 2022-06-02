@@ -1,24 +1,21 @@
 import type IWalletProvider from '.';
 import type { WalletType } from '$lib/stores/wallet';
+import { BlockchainId } from '$lib/constants';
 import { WavesKeeperWalletProvider } from './waveskeeper';
 import { memoize } from '$lib/utils/memoize';
-
-enum Blockchain {
-  Waves = 'waves'
-}
 
 export type ChainInfo = {
   chainId: string;
   name: string;
-  blockchain: Blockchain;
+  blockchain: BlockchainId;
 };
 
 const ChainsByWalletType: {
   [key in WalletType]: ChainInfo[];
 } = {
   waveskeeper: [
-    { chainId: 'W', name: 'WAVES Mainnet', blockchain: Blockchain.Waves },
-    { chainId: 'T', name: 'WAVES Testnet', blockchain: Blockchain.Waves }
+    { chainId: 'W', name: 'WAVES Mainnet', blockchain: BlockchainId.Waves },
+    { chainId: 'T', name: 'WAVES Testnet', blockchain: BlockchainId.Waves }
   ]
 };
 

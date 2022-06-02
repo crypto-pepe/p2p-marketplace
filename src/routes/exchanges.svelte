@@ -1,20 +1,21 @@
 <script context="module" lang="ts">
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { walletStore } from '$lib/stores/wallet';
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import { walletStore, loadFromLocalStorage } from '$lib/stores/wallet';
 </script>
 
 <script lang="ts">
-	onMount(() => {
-		if (!$walletStore.isConnected) {
-			goto('/');
-		}
-	});
+  onMount(async () => {
+    await loadFromLocalStorage();
+    if (!$walletStore.isConnected) {
+      goto('/');
+    }
+  });
 </script>
 
 <svelte:head>
-	<title>P2P - Exchanges</title>
-	<!-- <meta name="description" content="Svelte demo app" /> -->
+  <title>P2P - Exchanges</title>
+  <!-- <meta name="description" content="Svelte demo app" /> -->
 </svelte:head>
 
 <section>Exchanges</section>

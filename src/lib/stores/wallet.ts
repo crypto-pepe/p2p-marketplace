@@ -1,19 +1,23 @@
-import { writable } from "svelte/store";
-import type IWallet from "../wallet";
+import { writable } from 'svelte/store';
+import type { ChainId, BlockchainId } from '../constants';
+import type IWallet from '../wallet';
+import { getAvailableChains, getWalletByType } from '../wallet/helper';
 
-export type WalletType = "waveskeeper";
+export type WalletType = 'waveskeeper';
 
 type DisconnectedWalletState = {
   isConnected: false;
 };
 
 export type WalletInfoState = {
-  type: WalletType;
   address: string;
-}
+  chainId: ChainId<BlockchainId>;
+  blockchain: BlockchainId;
+  type: WalletType;
+};
 
 export type ConnectedWalletState = {
-  isConnected: true,
+  isConnected: true;
 } & WalletInfoState;
 
 export type WalletState = DisconnectedWalletState | ConnectedWalletState;
@@ -26,62 +30,79 @@ export type ConnectionError = {
 const DefaultWalletState: WalletState = { isConnected: false };
 const { subscribe, update } = writable<WalletState>({ ...DefaultWalletState });
 
+async function updateWalletState(wallet: IWallet<unknown>) {
+  try {
+    const address = await wallet.getAddress();
+    const chainId = (await wallet.getChainId()) as ChainId<BlockchainId>;
+    const type = wallet.getType();
+    const availableChain = getAvailableChains(type).find((chain) => chain.chainId === chainId);
+    const blockchain = availableChain?.blockchain as BlockchainId;
+    localStorage.setItem('connectedWallet', JSON.stringify({ address, type, blockchain, chainId }));
+    update(() => ({
+      isConnected: true,
+      address,
+      blockchain,
+      chainId,
+      type
+    }));
+  } catch {
+    update(() => ({
+      isConnected: false
+    }));
+  }
+}
+
 export async function connectWallet(wallet: IWallet<unknown>) {
   wallet.onConnect(async () => {
-    try {
-      const address = await wallet.getAddress();
-      const type = wallet.getType();
-      localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
-      update(() => ({
-        isConnected: true,
-        address,
-        type
-      }));
-    }
-    catch {
-      update(() => ({
-        isConnected: false,
-      }));
-    }
+    await updateWalletState(wallet);
   });
 
   wallet.onChange(async () => {
-    try {
-      const address = await wallet.getAddress();
-      const type = wallet.getType();
-      localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
-      update(() => ({
-        isConnected: true,
-        address,
-        type
-      }));
-    }
-    catch {
-      update(() => ({
-        isConnected: false,
-      }));
-    }
-  })
+    await updateWalletState(wallet);
+  });
 
   wallet.onDisconnect(() => {
     localStorage.removeItem('connectedWallet');
     update(() => DefaultWalletState);
   });
 
-  const address = await wallet.getAddress();
-  const type = wallet.getType();
-  localStorage.setItem('connectedWallet', JSON.stringify({ address, type }));
-
-  update(() => ({
-    isConnected: true,
-    address,
-    type
-  }));
+  await updateWalletState(wallet);
 }
 
 export async function disconnectWallet() {
   localStorage.removeItem('connectedWallet');
   update(() => DefaultWalletState);
 }
+
+function isWalletState(walletState: any): walletState is WalletInfoState {
+  return (
+    typeof walletState === 'object' &&
+    typeof walletState.address === 'string' &&
+    typeof walletState.type === 'string'
+  );
+}
+
+export const loadFromLocalStorage = async () => {
+  const initialState: string | null = localStorage.getItem('connectedWallet');
+  if (initialState !== null) {
+    try {
+      const walletState: WalletInfoState = JSON.parse(initialState);
+      if (isWalletState(walletState)) {
+        const wallet = getWalletByType(walletState.type);
+        if (await wallet.isAvailable()) {
+          return await connectWallet(wallet);
+        } else {
+          return null;
+        }
+      } else {
+        throw new Error('Cannot connect to wallet from LocalStorage');
+      }
+    } catch (e: any) {
+      localStorage.removeItem('connectedWallet');
+      console.log(e.message);
+      return null;
+    }
+  }
+};
 
 export const walletStore = { subscribe };
