@@ -6,19 +6,23 @@
   import type { BalancesStore } from '$lib/stores/token-balances';
   import { onDestroy, onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { walletStore } from '$lib/stores/wallet';
+  import { walletStore, loadFromLocalStorage } from '$lib/stores/wallet';
   import { createBalancesStore } from '$lib/stores/token-balances';
   import { pricesStore } from '$lib/stores/prices';
   import { getAvailableChains } from '$lib/wallet/helper';
-  import { balancesFrom, calculateTotalBalance } from '$lib/utils/balances';
+  import { balancesFrom, calculateTotalBalanceInUsd } from '$lib/utils/balances';
   import { AssetService } from '$lib/services/assets';
   import { BLOCKCHAINS } from '$lib/constants';
   import { initNodeClient } from '$lib/services/node-client/factory';
-  import { bigIntToFloatString, calculateFloatSimbols } from '$lib/utils/strings';
+  import { bigIntToFloatString } from '$lib/utils/strings';
+  import { getAssetPrecision } from '$lib/utils/asset-precision';
+  import { BalanceService } from '$lib/services/balance';
 
   type AssetInfosMap = {
     [key in CryptoAsset]: AssetInfo;
   };
+
+  type AsyncUnsubscriber = () => Promise<void>
 </script>
 
 <script lang="ts">
@@ -26,27 +30,27 @@
   let balancesState: BalancesStore;
   let balancesStore;
   let walletState: WalletState;
-  let balanceUnsubscriber: Unsubscriber;
+  let balanceUnsubscriber: AsyncUnsubscriber;
   let walletUnsubscriber: Unsubscriber;
 
   onMount(async () => {
-    await walletStore.loadFromLocalStorage();
+    await loadFromLocalStorage();
     walletUnsubscriber = walletStore.subscribe(async (state) => {
       walletState = state;
       if (walletState.isConnected) {
         let nodeClient = initNodeClient(walletState.blockchain, walletState.chainId as string);
+        const balanceService = new BalanceService(nodeClient, walletState.address);
         let assetsService = new AssetService(nodeClient);
 
         if (balanceUnsubscriber !== undefined) {
-          balanceUnsubscriber();
+          await balanceUnsubscriber();
         }
 
         balancesStore = createBalancesStore(
-          walletState.address,
           walletState.chainId,
           walletState.blockchain,
           walletState.type,
-          nodeClient
+          balanceService
         );
 
         balanceUnsubscriber = balancesStore.unsubscribe;
@@ -68,15 +72,15 @@
       } else {
         goto('/');
         if (balanceUnsubscriber) {
-          balanceUnsubscriber();
+          await balanceUnsubscriber();
         }
       }
     });
   });
 
-  onDestroy(() => {
+  onDestroy(async () => {
     if (balanceUnsubscriber) {
-      balanceUnsubscriber();
+      await balanceUnsubscriber();
     }
     if (walletUnsubscriber) {
       walletUnsubscriber();
@@ -106,7 +110,7 @@
     <br />
     Wallet type: {$walletStore.type}
     <br />
-    Total balance: $ {calculateTotalBalance(balances).toFixed(2)}
+    Total balance: $ {balances ? calculateTotalBalanceInUsd(balances).toFixed(2) : null}
     <br />
     <ul>
       {#if balances}
@@ -119,7 +123,7 @@
                   ? bigIntToFloatString(
                       balanceAmounts.amount,
                       assetInfosMap[assetName].decimals,
-                      calculateFloatSimbols(assetName)
+                      getAssetPrecision(assetName)
                     )
                   : balanceAmounts.amount}</span
               >&nbsp&nbsp

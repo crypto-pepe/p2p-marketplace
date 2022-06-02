@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
-import type { ChainId } from '../constants';
+import type { ChainId, BlockchainId } from '../constants';
 import type IWallet from '../wallet';
-import { BlockchainId, getAvailableChains, getWalletByType } from '../wallet/helper';
+import { getAvailableChains, getWalletByType } from '../wallet/helper';
 
 export type WalletType = 'waveskeeper';
 
@@ -74,7 +74,7 @@ export async function disconnectWallet() {
   update(() => DefaultWalletState);
 }
 
-function isValidWalletState(walletState: any): walletState is WalletInfoState {
+function isWalletState(walletState: any): walletState is WalletInfoState {
   return (
     typeof walletState === 'object' &&
     typeof walletState.address === 'string' &&
@@ -82,12 +82,12 @@ function isValidWalletState(walletState: any): walletState is WalletInfoState {
   );
 }
 
-const loadFromLocalStorage = async () => {
+export const loadFromLocalStorage = async () => {
   const initialState: string | null = localStorage.getItem('connectedWallet');
   if (initialState !== null) {
     try {
       const walletState: WalletInfoState = JSON.parse(initialState);
-      if (isValidWalletState(walletState)) {
+      if (isWalletState(walletState)) {
         const wallet = getWalletByType(walletState.type);
         if (await wallet.isAvailable()) {
           return await connectWallet(wallet);
@@ -95,7 +95,7 @@ const loadFromLocalStorage = async () => {
           return null;
         }
       } else {
-        throw new Error('Can not connect to wallet from storage');
+        throw new Error('Cannot connect to wallet from LocalStorage');
       }
     } catch (e: any) {
       localStorage.removeItem('connectedWallet');
@@ -105,4 +105,4 @@ const loadFromLocalStorage = async () => {
   }
 };
 
-export const walletStore = { subscribe, loadFromLocalStorage };
+export const walletStore = { subscribe };

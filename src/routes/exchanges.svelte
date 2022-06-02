@@ -1,12 +1,12 @@
 <script context="module" lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { walletStore } from '$lib/stores/wallet';
+  import { walletStore, loadFromLocalStorage } from '$lib/stores/wallet';
 </script>
 
 <script lang="ts">
   onMount(async () => {
-    await walletStore.loadFromLocalStorage();
+    await loadFromLocalStorage();
     if (!$walletStore.isConnected) {
       goto('/');
     }

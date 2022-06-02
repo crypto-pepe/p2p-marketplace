@@ -1,7 +1,6 @@
 import type { INodeClient } from '$lib/services/node-client';
-import { BLOCKCHAINS } from '$lib/constants';
+import { BLOCKCHAINS, BlockchainId } from '$lib/constants';
 import { WavesHttpNodeClient } from '$lib/services/node-client';
-import { BlockchainId } from '$lib/wallet/helper';
 
 export function initNodeClient(blockchainId: BlockchainId, chainId: string): INodeClient {
   const blockchain = BLOCKCHAINS[blockchainId];

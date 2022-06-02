@@ -1,6 +1,6 @@
 import type { AssetBalances } from 'src/lib/stores/token-balances';
 import type { BalancesForAssets } from 'src/lib/utils/balances';
-import { calculateTotalBalance } from 'src/lib/utils/balances';
+import { calculateTotalBalanceInUsd } from 'src/lib/utils/balances';
 import { _private } from 'src/lib/utils/balances';
 
 describe('Balances util calculateUsdPrice function', () => {
@@ -153,6 +153,6 @@ const totalBalanceTestValue: BalancesForAssets = {
 
 describe('Balances util calculateTotalBalance function', () => {
   test('should return total balance', () => {
-    expect(calculateTotalBalance(totalBalanceTestValue)).toBe(44);
+    expect(calculateTotalBalanceInUsd(totalBalanceTestValue)).toBe(44);
   });
 });

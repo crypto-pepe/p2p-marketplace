@@ -1,12 +1,12 @@
 import type { ReadableStreamDefaultReader, ReadableStreamDefaultReadResult } from 'stream/web';
-import type { INodeClient } from '$lib/services/node-client';
 import type { WalletType } from './wallet';
-import type { AssetIds, ChainId } from '$lib/constants';
+import type { AssetIds, ChainId, BlockchainId } from '$lib/constants';
+import type { BalanceService } from '$lib/services/balance';
 import { writable } from 'svelte/store';
 import { CryptoAsset } from '$lib/types';
 import { BLOCKCHAINS, LOOP_TIMEOUT_IN_MILLIS } from '$lib/constants';
-import { BalanceService, BalanceType } from '$lib/services/balance';
-import { BlockchainId, getAvailableChains } from '$lib/wallet/helper';
+import { BalanceType } from '$lib/services/balance';
+import { getAvailableChains } from '$lib/wallet/helper';
 
 export type BalancesStore = {
   [key in CryptoAsset]: AssetBalances;
@@ -38,24 +38,21 @@ const initialState: BalancesStore = Object.fromEntries(
         lockInOrdersReader: null
       }
     ];
-    return result as CryptoAsset[];
+    return result;
   })
 );
 
 function getNullableBalance(
   data: PromiseSettledResult<ReadableStreamDefaultReadResult<bigint>>
 ): bigint | null {
-  if (data.status === 'fulfilled') {
-    return typeof data.value.value === 'bigint' ? data.value.value : null;
+  if (data.status === 'fulfilled' && typeof data.value.value === 'bigint') {
+    return data.value.value;
   } else {
     return null;
   }
 }
 
-export function getBalancesReaders(
-  assets: AssetIds,
-  balanceService: BalanceService
-): BalancesReaders {
+function getBalancesReaders(assets: AssetIds, balanceService: BalanceService): BalancesReaders {
   const result = Object.fromEntries(
     Object.entries(assets).map(([assetName, assetId]) => {
       return [
@@ -71,7 +68,7 @@ export function getBalancesReaders(
   return result as BalancesReaders;
 }
 
-export function getBalancesState(balancesReaders: BalancesReaders): Promise<BalancesStore> {
+function getBalancesState(balancesReaders: BalancesReaders): Promise<BalancesStore> {
   const assetIds = Object.keys(balancesReaders) as CryptoAsset[];
   const ps = Object.values(balancesReaders).map((balanceReader) => {
     return Promise.allSettled([
@@ -92,20 +89,24 @@ export function getBalancesState(balancesReaders: BalancesReaders): Promise<Bala
     .then((balances) => Object.fromEntries(balances));
 }
 
-function unsubscribeSteamReaders(balancesReaders: BalancesReaders) {
-  Object.values(balancesReaders).forEach((readers) => {
-    Object.values(readers).forEach((stream: ReadableStreamDefaultReader<any>) => {
-      stream.cancel();
-    });
-  });
+async function unsubscribeSteamReaders(
+  balancesReaders: BalancesReaders
+): Promise<PromiseSettledResult<void>[]> {
+  const promicesCancelReaders = Object.values(balancesReaders).reduce(
+    (acc: Promise<void>[], readers) => [
+      ...acc,
+      ...Object.values(readers).map((stream: ReadableStreamDefaultReader<any>) => stream.cancel())
+    ],
+    []
+  );
+  return await Promise.allSettled(promicesCancelReaders);
 }
 
 export function createBalancesStore(
-  address: string,
   network: ChainId<BlockchainId>,
   blockchain: BlockchainId,
   walletType: WalletType,
-  nodeClient: INodeClient
+  balanceService: BalanceService
 ) {
   let balancesState: BalancesStore;
   let balancesReaders: BalancesReaders;
@@ -113,7 +114,6 @@ export function createBalancesStore(
   let isSubscribed: boolean = false;
 
   const { subscribe, set, update } = writable<BalancesStore>(initialState);
-  const balanceService = new BalanceService(nodeClient, address);
   const availableChains = getAvailableChains(walletType);
   const availableChain = availableChains.find((chain) => chain.chainId === network);
   if (availableChain) {
@@ -132,14 +132,14 @@ export function createBalancesStore(
     loop();
   }
 
-  function unsubscribe() {
+  async function unsubscribe() {
     isSubscribed = false;
     if (timerId) {
       clearTimeout(timerId);
       timerId = undefined;
     }
 
-    unsubscribeSteamReaders(balancesReaders);
+    await unsubscribeSteamReaders(balancesReaders);
     set(initialState);
   }
 

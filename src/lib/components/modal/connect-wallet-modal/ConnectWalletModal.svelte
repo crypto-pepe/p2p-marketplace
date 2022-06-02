@@ -26,10 +26,10 @@
   let modal: Modal;
   let connectionError: ConnectionError | undefined;
   let walletTypeInstall: WalletType = 'waveskeeper';
-  let prevConnetionState: boolean = $walletStore.isConnected;
+  let prevConnectionState: boolean = $walletStore.isConnected;
 
   walletStore.subscribe(({ isConnected }) => {
-    if (modal && prevConnetionState !== isConnected) {
+    if (modal && prevConnectionState !== isConnected) {
       modal.closeModal();
     }
   });

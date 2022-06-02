@@ -1,5 +1,6 @@
 import type { INodeClient } from '$lib/services/node-client';
 import type { AssetInfo } from '$lib/services/assets';
+import { CryptoAsset } from '$lib/types';
 
 type WavesHttpNodeClientCofig = {
   baseUrl: string;
@@ -9,7 +10,7 @@ export class WavesHttpNodeClient implements INodeClient {
   constructor(private readonly config: WavesHttpNodeClientCofig) {}
 
   getAddressBalance(address: string, assetId: string): Promise<bigint> {
-    if (assetId === 'WAVES') {
+    if (assetId === CryptoAsset.WAVES) {
       return fetch(`${this.config.baseUrl}/addresses/balance/${address}`)
         .then((response) => response.json())
         .then((data) => BigInt(data.balance));
@@ -21,7 +22,7 @@ export class WavesHttpNodeClient implements INodeClient {
   }
 
   getAssetDetails(assetId: string): Promise<AssetInfo> {
-    if (assetId === 'WAVES') {
+    if (assetId === CryptoAsset.WAVES) {
       return Promise.resolve().then(() => ({ decimals: 8, assetId: 'WAVES', symbol: 'WAVES' }));
     } else {
       return fetch(`${this.config.baseUrl}/assets/details/${assetId}`)

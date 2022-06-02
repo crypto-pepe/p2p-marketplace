@@ -1,11 +1,11 @@
 <script context="module" lang="ts">
   import { onMount } from 'svelte';
-  import { walletStore } from '$lib/stores/wallet';
+  import { loadFromLocalStorage } from '$lib/stores/wallet';
 </script>
 
 <script lang="ts">
   onMount(async () => {
-    await walletStore.loadFromLocalStorage();
+    await loadFromLocalStorage();
   });
 </script>
 

@@ -1,11 +1,8 @@
 import type IWalletProvider from '.';
 import type { WalletType } from '$lib/stores/wallet';
+import { BlockchainId } from '$lib/constants';
 import { WavesKeeperWalletProvider } from './waveskeeper';
 import { memoize } from '$lib/utils/memoize';
-
-export enum BlockchainId {
-  Waves = 'waves'
-}
 
 export type ChainInfo = {
   chainId: string;
