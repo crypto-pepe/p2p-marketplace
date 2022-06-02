@@ -52,12 +52,12 @@ export const BLOCKCHAINS: Blockchains = {
         chainId: 'T',
         chainName: 'Waves testnet',
         assets: {
-          WAVES: 'c',
-          USDT: 'a',
-          BTC: 'b',
-          ETH: 'd'
+          WAVES: 'WAVES',
+          USDT: '5Sh9KghfkZyhjwuodovDhB6PghDUGBHiAPZ4MkrPgKtX',
+          BTC: 'DWgwcZTMhSvnyYCoWLRUXXSH1RSkzThXLJhww9gwkqdn',
+          ETH: 'BrmjyAWT5jjr3Wpsiyivyvg5vDuzoX2s93WgiexXetB3'
         },
-        baseUrl: ''
+        baseUrl: 'https://nodes-testnet.wavesnodes.com'
       },
       W: {
         chainId: 'W',

@@ -1,4 +1,4 @@
-import { CryptoAsset } from "$lib/types";
+import { CryptoAsset } from '$lib/types';
 
 export function getAssetPrecision(assetName: CryptoAsset): number {
   switch (assetName) {
@@ -11,6 +11,6 @@ export function getAssetPrecision(assetName: CryptoAsset): number {
     case CryptoAsset.ETH:
       return 5;
     default:
-      throw new Error('This asset is undefined')
+      throw new Error('This asset is undefined');
   }
 }
